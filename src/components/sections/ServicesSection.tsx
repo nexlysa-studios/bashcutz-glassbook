@@ -105,12 +105,17 @@ export function ServicesSection({ onSelectService }: ServicesSectionProps) {
       <div className="absolute inset-0 bg-gradient-to-b from-black via-neutral-950/50 to-black" />
 
       <div className="relative z-10 max-w-4xl mx-auto">
-        <h2
-          ref={titleRef}
-          className="text-3xl md:text-4xl font-bold text-center mb-16 tracking-tight opacity-0"
-        >
-          Our Services
-        </h2>
+        <div className="text-center mb-16">
+          <span className="text-gold text-sm font-medium tracking-widest uppercase mb-4 block">
+            What We Offer
+          </span>
+          <h2
+            ref={titleRef}
+            className="text-3xl md:text-4xl font-bold tracking-tight opacity-0"
+          >
+            Our Services
+          </h2>
+        </div>
 
         <div
           ref={cardsRef}
@@ -123,7 +128,7 @@ export function ServicesSection({ onSelectService }: ServicesSectionProps) {
               className="glass-card-hover p-8 text-left group tap-feedback"
             >
               {/* Icon */}
-              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6 group-hover:bg-white/15 transition-colors duration-300">
+              <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center mb-6 group-hover:bg-gold/20 transition-colors duration-300">
                 <IconComponent type={service.icon} />
               </div>
 
@@ -133,7 +138,7 @@ export function ServicesSection({ onSelectService }: ServicesSectionProps) {
 
               {/* Price & Duration */}
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">R{service.price}</span>
+                <span className="text-2xl font-bold text-gold">R{service.price}</span>
                 <span className="text-sm text-white/40">{service.duration}</span>
               </div>
 

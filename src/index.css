@@ -8,7 +8,7 @@
 
 @layer base {
   :root {
-    /* Core Colors - Dark Premium Palette */
+    /* Core Colors - Dark Premium Palette with Gold Accents */
     --background: 0 0% 3%;
     --foreground: 0 0% 98%;
 
@@ -19,8 +19,8 @@
     --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
 
-    /* Primary - Pure white accent */
-    --primary: 0 0% 100%;
+    /* Primary - Gold/Yellow accent */
+    --primary: 45 100% 51%;
     --primary-foreground: 0 0% 0%;
 
     /* Secondary - Soft grey */
@@ -31,9 +31,9 @@
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 60%;
 
-    /* Accent - Slightly lighter grey */
-    --accent: 0 0% 18%;
-    --accent-foreground: 0 0% 98%;
+    /* Accent - Gold tinted */
+    --accent: 45 80% 50%;
+    --accent-foreground: 0 0% 0%;
 
     /* Destructive - Soft red */
     --destructive: 0 72% 51%;
@@ -42,9 +42,14 @@
     /* Borders - Very subtle */
     --border: 0 0% 20%;
     --input: 0 0% 15%;
-    --ring: 0 0% 40%;
+    --ring: 45 100% 51%;
 
     --radius: 1rem;
+
+    /* Gold accent colors */
+    --gold: 45 100% 51%;
+    --gold-light: 45 100% 60%;
+    --gold-dark: 45 100% 40%;
 
     /* Glass Effect Variables */
     --glass-bg: 0 0% 100% / 0.05;
@@ -56,6 +61,7 @@
     --gradient-dark: linear-gradient(135deg, hsl(0 0% 5%) 0%, hsl(0 0% 2%) 100%);
     --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.1) 0%, hsla(0, 0%, 100%, 0.05) 100%);
     --gradient-shine: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.1), transparent);
+    --gradient-gold: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%);
 
     /* Sidebar */
     --sidebar-background: 0 0% 5%;
@@ -152,19 +158,19 @@
     transform: scale(0.98);
   }
 
-  /* Primary Glass Button (White) */
+  /* Primary Glass Button (Gold) */
   .glass-button-primary {
     @apply relative overflow-hidden rounded-xl px-8 py-4 font-semibold transition-all duration-300;
-    background: hsla(0, 0%, 100%, 0.95);
+    background: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%);
     color: hsl(0, 0%, 0%);
-    border: 1px solid hsla(0, 0%, 100%, 1);
-    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid hsla(45, 100%, 60%, 0.5);
+    box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3);
   }
 
   .glass-button-primary:hover {
-    background: hsla(0, 0%, 100%, 1);
+    background: linear-gradient(135deg, hsl(45 100% 55%) 0%, hsl(35 100% 50%) 100%);
     transform: scale(1.02);
-    box-shadow: 0 6px 30px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 30px rgba(255, 193, 7, 0.4);
   }
 
   .glass-button-primary:active {
@@ -213,9 +219,9 @@
   }
 
   .time-slot-selected {
-    background: hsla(0, 0%, 100%, 0.9) !important;
+    background: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%) !important;
     color: hsl(0, 0%, 0%) !important;
-    border-color: hsla(0, 0%, 100%, 1) !important;
+    border-color: hsla(45, 100%, 60%, 0.5) !important;
   }
 
   .time-slot-disabled {
@@ -232,7 +238,7 @@
   }
 
   .calendar-day-selected {
-    background: hsla(0, 0%, 100%, 0.95) !important;
+    background: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%) !important;
     color: hsl(0, 0%, 0%) !important;
   }
 

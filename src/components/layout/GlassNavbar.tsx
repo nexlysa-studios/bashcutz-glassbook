@@ -30,28 +30,40 @@ export function GlassNavbar() {
           to="/"
           className="text-lg font-bold tracking-tight tap-feedback"
         >
-          BASHCUTZ
+          <span className="text-gold">BASH</span>CUTZ
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
           <a
             href="/#services"
-            className="text-sm text-white/60 hover:text-white transition-colors duration-300"
+            className="text-sm text-white/60 hover:text-gold transition-colors duration-300"
           >
             Services
+          </a>
+          <a
+            href="/#gallery"
+            className="text-sm text-white/60 hover:text-gold transition-colors duration-300"
+          >
+            Gallery
+          </a>
+          <a
+            href="/#merch"
+            className="text-sm text-white/60 hover:text-gold transition-colors duration-300"
+          >
+            Merch
           </a>
           <Link
             to="/admin"
             className={`text-sm transition-colors duration-300 ${
-              isAdminPage ? 'text-white' : 'text-white/60 hover:text-white'
+              isAdminPage ? 'text-gold' : 'text-white/60 hover:text-gold'
             }`}
           >
             Admin
           </Link>
           <a
             href="/#services"
-            className="glass-button text-sm"
+            className="glass-button text-sm border-gold/30 hover:border-gold/50"
           >
             Book Now
           </a>
@@ -80,21 +92,35 @@ export function GlassNavbar() {
           <a
             href="/#services"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="text-white/60 hover:text-white transition-colors duration-300"
+            className="text-white/60 hover:text-gold transition-colors duration-300"
           >
             Services
+          </a>
+          <a
+            href="/#gallery"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="text-white/60 hover:text-gold transition-colors duration-300"
+          >
+            Gallery
+          </a>
+          <a
+            href="/#merch"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="text-white/60 hover:text-gold transition-colors duration-300"
+          >
+            Merch
           </a>
           <Link
             to="/admin"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="text-white/60 hover:text-white transition-colors duration-300"
+            className="text-white/60 hover:text-gold transition-colors duration-300"
           >
             Admin
           </Link>
           <a
             href="/#services"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="glass-button text-center mt-2"
+            className="glass-button text-center mt-2 border-gold/30"
           >
             Book Now
           </a>
