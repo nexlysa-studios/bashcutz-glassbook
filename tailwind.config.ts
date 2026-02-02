@@ -60,6 +60,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Gold accent colors
+        gold: {
+          DEFAULT: "hsl(45 100% 51%)",
+          light: "hsl(45 100% 60%)",
+          dark: "hsl(45 100% 40%)",
+        },
         // Glass colors
         glass: {
           DEFAULT: "hsla(0, 0%, 100%, 0.05)",

@@ -67,14 +67,22 @@ export function HeroSection({ onBookNow }: HeroSectionProps) {
           ref={headlineRef}
           className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 opacity-0"
           style={{
-            background: 'linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%)',
+            background: 'linear-gradient(180deg, #FFD700 0%, #FFA500 50%, #ffffff 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
           }}
         >
           BASHCUTZ
-          <span className="block text-3xl md:text-4xl lg:text-5xl font-light mt-2 tracking-widest">
+          <span 
+            className="block text-3xl md:text-4xl lg:text-5xl font-light mt-2 tracking-widest"
+            style={{
+              background: 'linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
             WorldWide
           </span>
         </h1>
@@ -83,7 +91,7 @@ export function HeroSection({ onBookNow }: HeroSectionProps) {
           ref={subheadlineRef}
           className="text-lg md:text-xl text-white/60 font-light tracking-[0.3em] uppercase mb-12 opacity-0"
         >
-          Precision · Style · Confidence
+          Precision <span className="text-gold">·</span> Style <span className="text-gold">·</span> Confidence
         </p>
 
         <button

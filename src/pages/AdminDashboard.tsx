@@ -55,26 +55,31 @@ export default function AdminDashboard() {
 
       <main className="pt-24 pb-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold mb-8">Admin Dashboard</h1>
+          <div className="mb-8">
+            <span className="text-gold text-sm font-medium tracking-widest uppercase mb-2 block">
+              Dashboard
+            </span>
+            <h1 className="text-3xl md:text-4xl font-bold">Admin Panel</h1>
+          </div>
 
           {/* Stats Grid */}
           <div className="grid gap-6 md:grid-cols-3 mb-8">
             <div className="admin-card glass-card p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                  <Calendar className="w-6 h-6" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-gold" />
                 </div>
                 <div>
                   <p className="text-white/50 text-sm">Today's Bookings</p>
-                  <p className="text-2xl font-bold">{todayBookings.length}</p>
+                  <p className="text-2xl font-bold text-gold">{todayBookings.length}</p>
                 </div>
               </div>
             </div>
 
             <div className="admin-card glass-card p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                  <Users className="w-6 h-6" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-gold" />
                 </div>
                 <div>
                   <p className="text-white/50 text-sm">Total Bookings</p>
@@ -84,9 +89,9 @@ export default function AdminDashboard() {
             </div>
 
             <div className="admin-card glass-card p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                  <Lock className="w-6 h-6" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <Lock className="w-6 h-6 text-gold" />
                 </div>
                 <div>
                   <p className="text-white/50 text-sm">Blocked Days</p>
@@ -148,13 +153,13 @@ export default function AdminDashboard() {
                       onClick={() => setSelectedDate(isSelected ? null : dateStr)}
                       className={`
                         h-12 rounded-lg flex flex-col items-center justify-center text-sm transition-all duration-200 tap-feedback
-                        ${isSelected ? 'bg-white text-black' : isBlocked ? 'bg-red-500/20 text-red-400' : 'hover:bg-white/10'}
-                        ${isToday && !isSelected ? 'ring-1 ring-white/30' : ''}
+                        ${isSelected ? 'bg-gold text-black' : isBlocked ? 'bg-red-500/20 text-red-400' : 'hover:bg-white/10'}
+                        ${isToday && !isSelected ? 'ring-1 ring-gold/50' : ''}
                       `}
                     >
                       <span className="font-medium">{format(date, 'd')}</span>
                       {dayBookings.length > 0 && !isBlocked && (
-                        <span className={`text-xs ${isSelected ? 'text-black/60' : 'text-white/50'}`}>
+                        <span className={`text-xs ${isSelected ? 'text-black/60' : 'text-gold'}`}>
                           {dayBookings.length}
                         </span>
                       )}
@@ -212,7 +217,7 @@ export default function AdminDashboard() {
                           <p className="font-medium">{booking.customerName}</p>
                           <p className="text-sm text-white/50">{booking.customerPhone}</p>
                           <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
-                            <span>{booking.service.name}</span>
+                            <span className="text-gold">{booking.service.name}</span>
                             <span>•</span>
                             <span>{booking.time}</span>
                             {!selectedDate && (
