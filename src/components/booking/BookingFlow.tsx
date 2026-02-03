@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { X, ArrowLeft } from 'lucide-react';
+import { X, ArrowLeft, Check, Calendar, Clock, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { Service } from '../sections/ServicesSection';
 import { GlassCalendar } from './GlassCalendar';
@@ -27,20 +27,24 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
   const { addBooking } = useBooking();
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       
-      gsap.fromTo(
+      const tl = gsap.timeline();
+      
+      tl.fromTo(
         overlayRef.current,
         { opacity: 0 },
-        { opacity: 1, duration: 0.3 }
-      );
-      gsap.fromTo(
+        { opacity: 1, duration: 0.4, ease: 'power2.out' }
+      )
+      .fromTo(
         panelRef.current,
-        { x: '100%' },
-        { x: '0%', duration: 0.5, ease: 'power3.out' }
+        { x: '100%', opacity: 0 },
+        { x: '0%', opacity: 1, duration: 0.6, ease: 'power4.out' },
+        '-=0.2'
       );
     }
 
@@ -49,14 +53,21 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
     };
   }, [isOpen]);
 
+  // Animate content when step changes
+  useEffect(() => {
+    if (contentRef.current && isOpen) {
+      gsap.fromTo(
+        contentRef.current,
+        { opacity: 0, y: 20, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: 'power3.out' }
+      );
+    }
+  }, [step, isOpen]);
+
   const handleClose = () => {
-    gsap.to(panelRef.current, {
-      x: '100%',
-      duration: 0.4,
-      ease: 'power3.in',
+    const tl = gsap.timeline({
       onComplete: () => {
         onClose();
-        // Reset state
         setStep('date');
         setSelectedDate(null);
         setSelectedTime(null);
@@ -64,7 +75,14 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
         setShowConfirmation(false);
       },
     });
-    gsap.to(overlayRef.current, { opacity: 0, duration: 0.3 });
+    
+    tl.to(panelRef.current, {
+      x: '100%',
+      opacity: 0,
+      duration: 0.4,
+      ease: 'power3.in',
+    })
+    .to(overlayRef.current, { opacity: 0, duration: 0.3 }, '-=0.2');
   };
 
   const handleDateSelect = (date: Date) => {
@@ -93,7 +111,6 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
       customerPhone: customerData.phone,
     });
 
-    // Create WhatsApp message
     const message = encodeURIComponent(
       `🪒 *BASHCUTZ Booking Confirmation*\n\n` +
       `👤 Name: ${customerData.name}\n` +
@@ -105,7 +122,6 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
       `Booking ID: ${booking.id}`
     );
 
-    // Open WhatsApp (replace with actual number)
     const whatsappUrl = `https://wa.me/27000000000?text=${message}`;
     window.open(whatsappUrl, '_blank');
 
@@ -121,70 +137,101 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
     }
   };
 
-  const getStepTitle = () => {
-    switch (step) {
-      case 'date': return 'Select Date';
-      case 'time': return 'Select Time';
-      case 'details': return 'Your Details';
-      default: return '';
-    }
-  };
+  const steps = [
+    { id: 'date', label: 'Date', icon: Calendar },
+    { id: 'time', label: 'Time', icon: Clock },
+    { id: 'details', label: 'Details', icon: User },
+  ];
+
+  const currentStepIndex = steps.findIndex(s => s.id === step);
 
   if (!isOpen) return null;
 
   return (
     <>
+      {/* Overlay */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 z-40 glass-overlay"
+        className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm"
         onClick={handleClose}
       />
 
+      {/* Panel */}
       <div
         ref={panelRef}
-        className="fixed right-0 top-0 bottom-0 z-50 w-full md:w-[480px] bg-black/95 backdrop-blur-xl border-l border-white/10 flex flex-col"
+        className="fixed right-0 top-0 bottom-0 z-50 w-full md:w-[520px] bg-gradient-to-b from-neutral-950 to-black border-l border-white/10 flex flex-col shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-6 border-b border-white/10 bg-black/50 backdrop-blur-xl">
           <div className="flex items-center gap-4">
             {step !== 'date' && (
               <button
                 onClick={goBack}
-                className="p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors tap-feedback"
+                className="p-2.5 -ml-2 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 tap-feedback group"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
               </button>
             )}
             <div>
-              <h2 className="text-xl font-bold">{getStepTitle()}</h2>
-              <p className="text-sm text-white/50">{service.name} — R{service.price}</p>
+              <h2 className="text-xl font-bold">Book Appointment</h2>
+              <p className="text-sm text-gold">{service.name} — R{service.price}</p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors tap-feedback"
+            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 tap-feedback group"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
           </button>
         </div>
 
-        {/* Progress indicators */}
-        <div className="flex gap-2 px-6 py-4">
-          {['date', 'time', 'details'].map((s, i) => (
-            <div
-              key={s}
-              className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                ['date', 'time', 'details'].indexOf(step) >= i
-                  ? 'bg-white/80'
-                  : 'bg-white/20'
-              }`}
-            />
-          ))}
+        {/* Progress Steps */}
+        <div className="px-6 py-5 border-b border-white/5">
+          <div className="flex items-center justify-between">
+            {steps.map((s, i) => {
+              const Icon = s.icon;
+              const isActive = i === currentStepIndex;
+              const isComplete = i < currentStepIndex;
+              
+              return (
+                <div key={s.id} className="flex items-center">
+                  <div className="flex flex-col items-center">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${
+                        isComplete
+                          ? 'bg-gold text-black'
+                          : isActive
+                          ? 'bg-gold/20 text-gold border-2 border-gold'
+                          : 'bg-white/5 text-white/30'
+                      }`}
+                    >
+                      {isComplete ? (
+                        <Check className="w-5 h-5" />
+                      ) : (
+                        <Icon className="w-5 h-5" />
+                      )}
+                    </div>
+                    <span className={`text-xs mt-2 font-medium transition-colors duration-300 ${
+                      isActive ? 'text-gold' : isComplete ? 'text-white/60' : 'text-white/30'
+                    }`}>
+                      {s.label}
+                    </span>
+                  </div>
+                  
+                  {i < steps.length - 1 && (
+                    <div className={`w-16 md:w-24 h-0.5 mx-2 mb-6 rounded-full transition-colors duration-500 ${
+                      i < currentStepIndex ? 'bg-gold' : 'bg-white/10'
+                    }`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+        <div ref={contentRef} className="flex-1 overflow-y-auto p-6 scrollbar-hide">
           {step === 'date' && (
             <GlassCalendar
               selectedDate={selectedDate}
@@ -207,6 +254,9 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
             />
           )}
         </div>
+
+        {/* Footer accent */}
+        <div className="h-1 bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
       </div>
 
       {/* Confirmation Modal */}
