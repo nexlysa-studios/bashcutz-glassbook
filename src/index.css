@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* BASHCUTZ WorldWide - iOS Glassmorphism Design System */
+/* BASHCUTZ WorldWide - Premium iOS Glassmorphism Design System */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
@@ -44,7 +44,7 @@
     --input: 0 0% 15%;
     --ring: 45 100% 51%;
 
-    --radius: 1rem;
+    --radius: 1.25rem;
 
     /* Gold accent colors */
     --gold: 45 100% 51%;
@@ -52,15 +52,15 @@
     --gold-dark: 45 100% 40%;
 
     /* Glass Effect Variables */
-    --glass-bg: 0 0% 100% / 0.05;
-    --glass-border: 0 0% 100% / 0.1;
-    --glass-blur: 20px;
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --glass-bg: 0 0% 100% / 0.03;
+    --glass-border: 0 0% 100% / 0.08;
+    --glass-blur: 25px;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 
     /* Gradients */
-    --gradient-dark: linear-gradient(135deg, hsl(0 0% 5%) 0%, hsl(0 0% 2%) 100%);
-    --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.1) 0%, hsla(0, 0%, 100%, 0.05) 100%);
-    --gradient-shine: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.1), transparent);
+    --gradient-dark: linear-gradient(135deg, hsl(0 0% 4%) 0%, hsl(0 0% 1%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.08) 0%, hsla(0, 0%, 100%, 0.02) 100%);
+    --gradient-shine: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.15), transparent);
     --gradient-gold: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%);
 
     /* Sidebar */
@@ -75,7 +75,6 @@
   }
 
   .dark {
-    /* Same as root - this is a dark-first design */
     --background: 0 0% 3%;
     --foreground: 0 0% 98%;
   }
@@ -97,19 +96,31 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     background: var(--gradient-dark);
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* Custom selection color */
+  /* Custom selection color - Gold */
   ::selection {
-    background: hsla(0, 0%, 100%, 0.2);
+    background: hsla(45, 100%, 51%, 0.3);
     color: hsl(var(--foreground));
+  }
+
+  /* Hide default cursor for custom cursor */
+  @media (pointer: fine) {
+    body {
+      cursor: none;
+    }
+    
+    a, button, [role="button"] {
+      cursor: none;
+    }
   }
 }
 
 @layer components {
-  /* iOS-style Glass Card */
+  /* Premium Glass Card */
   .glass-card {
-    @apply relative overflow-hidden rounded-2xl;
+    @apply relative overflow-hidden rounded-3xl;
     background: hsla(var(--glass-bg));
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -124,34 +135,39 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.2), transparent);
   }
 
-  /* Glass Card Hover */
+  /* Glass Card Hover with 3D effect */
   .glass-card-hover {
-    @apply glass-card transition-all duration-500 ease-out;
+    @apply glass-card transition-all duration-700 ease-out;
+    transform-style: preserve-3d;
+    perspective: 1000px;
   }
 
   .glass-card-hover:hover {
-    background: hsla(0, 0%, 100%, 0.08);
-    border-color: hsla(0, 0%, 100%, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+    background: hsla(0, 0%, 100%, 0.06);
+    border-color: hsla(45, 100%, 51%, 0.2);
+    transform: translateY(-4px);
+    box-shadow: 
+      0 20px 60px 0 rgba(0, 0, 0, 0.6),
+      0 0 40px -10px hsla(45, 100%, 51%, 0.2);
   }
 
   /* Glass Button */
   .glass-button {
-    @apply relative overflow-hidden rounded-xl px-6 py-3 font-medium transition-all duration-300;
-    background: hsla(0, 0%, 100%, 0.1);
+    @apply relative overflow-hidden rounded-2xl px-8 py-4 font-semibold transition-all duration-300;
+    background: hsla(0, 0%, 100%, 0.08);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid hsla(0, 0%, 100%, 0.2);
+    border: 1px solid hsla(0, 0%, 100%, 0.15);
   }
 
   .glass-button:hover {
-    background: hsla(0, 0%, 100%, 0.15);
-    border-color: hsla(0, 0%, 100%, 0.3);
+    background: hsla(0, 0%, 100%, 0.12);
+    border-color: hsla(0, 0%, 100%, 0.25);
     transform: scale(1.02);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
   }
 
   .glass-button:active {
@@ -160,105 +176,114 @@
 
   /* Primary Glass Button (Gold) */
   .glass-button-primary {
-    @apply relative overflow-hidden rounded-xl px-8 py-4 font-semibold transition-all duration-300;
+    @apply relative overflow-hidden rounded-2xl px-10 py-4 font-bold transition-all duration-300;
     background: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%);
     color: hsl(0, 0%, 0%);
-    border: 1px solid hsla(45, 100%, 60%, 0.5);
-    box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3);
+    border: 1px solid hsla(45, 100%, 65%, 0.5);
+    box-shadow: 
+      0 4px 20px rgba(255, 193, 7, 0.3),
+      inset 0 1px 0 hsla(0, 0%, 100%, 0.3);
   }
 
   .glass-button-primary:hover {
     background: linear-gradient(135deg, hsl(45 100% 55%) 0%, hsl(35 100% 50%) 100%);
-    transform: scale(1.02);
-    box-shadow: 0 6px 30px rgba(255, 193, 7, 0.4);
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 
+      0 8px 40px rgba(255, 193, 7, 0.4),
+      inset 0 1px 0 hsla(0, 0%, 100%, 0.4);
   }
 
   .glass-button-primary:active {
     transform: scale(0.98);
   }
 
-  /* Glass Navbar */
-  .glass-navbar {
-    @apply fixed top-0 left-0 right-0 z-50;
-    background: hsla(0, 0%, 5%, 0.7);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border-bottom: 1px solid hsla(0, 0%, 100%, 0.08);
-  }
-
-  /* Glass Input */
+  /* Glass Input - Premium */
   .glass-input {
-    @apply w-full rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground transition-all duration-300 outline-none;
-    background: hsla(0, 0%, 100%, 0.05);
+    @apply w-full rounded-2xl px-5 py-4 text-foreground placeholder:text-muted-foreground transition-all duration-300 outline-none;
+    background: hsla(0, 0%, 100%, 0.04);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid hsla(0, 0%, 100%, 0.1);
+    border: 1px solid hsla(0, 0%, 100%, 0.08);
   }
 
   .glass-input:focus {
-    background: hsla(0, 0%, 100%, 0.08);
-    border-color: hsla(0, 0%, 100%, 0.3);
-    box-shadow: 0 0 0 3px hsla(0, 0%, 100%, 0.1);
+    background: hsla(0, 0%, 100%, 0.06);
+    border-color: hsla(45, 100%, 51%, 0.4);
+    box-shadow: 
+      0 0 0 4px hsla(45, 100%, 51%, 0.1),
+      0 4px 20px rgba(0, 0, 0, 0.3);
   }
 
   /* Glass Modal Overlay */
   .glass-overlay {
-    background: hsla(0, 0%, 0%, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: hsla(0, 0%, 0%, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
-  /* iOS-style time slot */
+  /* Premium time slot */
   .time-slot {
-    @apply glass-card px-4 py-3 text-center cursor-pointer transition-all duration-300;
+    @apply glass-card px-4 py-4 text-center cursor-pointer transition-all duration-300 font-medium;
   }
 
   .time-slot:hover:not(.time-slot-disabled) {
     background: hsla(0, 0%, 100%, 0.1);
-    border-color: hsla(0, 0%, 100%, 0.2);
+    border-color: hsla(45, 100%, 51%, 0.3);
+    transform: scale(1.02);
   }
 
   .time-slot-selected {
     background: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%) !important;
     color: hsl(0, 0%, 0%) !important;
-    border-color: hsla(45, 100%, 60%, 0.5) !important;
+    font-weight: 700 !important;
+    border-color: hsla(45, 100%, 65%, 0.5) !important;
+    box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3) !important;
   }
 
   .time-slot-disabled {
-    @apply opacity-30 cursor-not-allowed;
+    @apply opacity-25 cursor-not-allowed;
   }
 
-  /* Calendar Day Styles */
+  /* Calendar Day Styles - Premium */
   .calendar-day {
-    @apply w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200;
+    @apply w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 font-medium;
   }
 
   .calendar-day:hover:not(.calendar-day-disabled) {
     background: hsla(0, 0%, 100%, 0.1);
+    transform: scale(1.1);
   }
 
   .calendar-day-selected {
     background: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%) !important;
     color: hsl(0, 0%, 0%) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4) !important;
+    transform: scale(1.05);
   }
 
   .calendar-day-disabled {
-    @apply opacity-30 cursor-not-allowed;
+    @apply opacity-25 cursor-not-allowed;
   }
 
   .calendar-day-today {
-    @apply ring-1 ring-white/30;
+    @apply ring-2 ring-gold/40;
+  }
+
+  /* Magnetic element indicator */
+  .magnetic {
+    transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
   }
 }
 
 @layer utilities {
-  /* Text gradient utility */
-  .text-gradient {
+  /* Text gradient utility - Gold */
+  .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 70%) 100%);
+    background-image: linear-gradient(135deg, hsl(45 100% 51%) 0%, hsl(35 100% 45%) 100%);
   }
 
-  /* Shine animation */
+  /* Premium shine animation */
   .shine {
     position: relative;
     overflow: hidden;
@@ -272,52 +297,41 @@
     width: 100%;
     height: 100%;
     background: var(--gradient-shine);
-    animation: shine 3s infinite;
+    animation: shine 4s infinite;
   }
 
   @keyframes shine {
-    0% {
-      left: -100%;
-    }
-    50%, 100% {
-      left: 100%;
-    }
+    0% { left: -100%; }
+    50%, 100% { left: 100%; }
   }
 
-  /* Floating animation */
+  /* Floating animation - smoother */
   .float {
-    animation: float 6s ease-in-out infinite;
+    animation: float 8s ease-in-out infinite;
   }
 
   @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(-5px) rotate(-1deg); }
   }
 
-  /* Pulse glow */
-  .pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
+  /* Gold pulse glow */
+  .pulse-glow-gold {
+    animation: pulse-glow-gold 3s ease-in-out infinite;
   }
 
-  @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-    }
-    50% {
-      box-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
-    }
+  @keyframes pulse-glow-gold {
+    0%, 100% { box-shadow: 0 0 20px hsla(45, 100%, 51%, 0.2); }
+    50% { box-shadow: 0 0 50px hsla(45, 100%, 51%, 0.4); }
   }
 
-  /* iOS-style tap feedback */
+  /* Premium tap feedback */
   .tap-feedback {
-    @apply transition-transform duration-100 active:scale-95;
+    @apply transition-all duration-150 active:scale-95 active:opacity-80;
   }
 
-  /* Hide scrollbar but keep functionality */
+  /* Hide scrollbar */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -327,10 +341,34 @@
     display: none;
   }
 
-  /* Stagger animation delay utilities */
+  /* Stagger animation delays */
   .stagger-1 { animation-delay: 0.1s; }
   .stagger-2 { animation-delay: 0.2s; }
   .stagger-3 { animation-delay: 0.3s; }
   .stagger-4 { animation-delay: 0.4s; }
   .stagger-5 { animation-delay: 0.5s; }
+
+  /* Smooth reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Text shadow for headings */
+  .text-shadow-glow {
+    text-shadow: 0 0 40px hsla(45, 100%, 51%, 0.3);
+  }
+
+  /* Border glow effect */
+  .border-glow {
+    box-shadow: 
+      0 0 20px -5px hsla(45, 100%, 51%, 0.2),
+      inset 0 0 20px -5px hsla(45, 100%, 51%, 0.1);
+  }
 }
