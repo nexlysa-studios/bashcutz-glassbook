@@ -118,6 +118,22 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
               Card
             </button>
           </div>
+          <button
+            type="button"
+            onTouchStart={() => selectPaymentMethod('online')}
+            onMouseDown={() => selectPaymentMethod('online')}
+            onPointerDown={() => selectPaymentMethod('online')}
+            onClick={() => selectPaymentMethod('online')}
+            className={`glass-button tap-feedback w-full mt-3 flex items-center justify-center gap-2 ${paymentMethod === 'online' ? '!bg-amber-500/20 !border-amber-300/60 !text-white !shadow-[0_0_12px_rgba(255,193,7,0.35)]' : 'text-white/70'}`}
+          >
+            <span>Pay Online</span>
+            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 border border-white/20">Yoco · Secure</span>
+          </button>
+          {paymentMethod === 'online' && (
+            <p className="text-xs text-white/50 mt-2">
+              You'll be redirected to Yoco's secure checkout after confirming.
+            </p>
+          )}
           {errors.paymentMethod && (
             <p className="text-red-400 text-sm mt-2">{errors.paymentMethod}</p>
           )}
