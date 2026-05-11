@@ -22,7 +22,7 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
   const [step, setStep] = useState<BookingStep>('date');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [customerData, setCustomerData] = useState<{ name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean } | null>(null);
+  const [customerData, setCustomerData] = useState<{ name: string; phone: string; paymentMethod: 'cash' | 'card' | 'online'; firstTimeCutter: boolean } | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const { addBooking } = useBooking();
@@ -83,7 +83,7 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
     setStep('details');
   };
 
-  const handleCustomerSubmit = (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean }) => {
+  const handleCustomerSubmit = (data: { name: string; phone: string; paymentMethod: 'cash' | 'card' | 'online'; firstTimeCutter: boolean }) => {
     setCustomerData(data);
     setShowConfirmation(true);
   };
