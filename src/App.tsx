@@ -13,6 +13,7 @@ import AdminLogin from "./pages/AdminLogin";
 import MerchCatalog from "./pages/MerchCatalog";
 import MerchProduct from "./pages/MerchProduct";
 import NotFound from "./pages/NotFound";
+import BookingSuccess from "./pages/BookingSuccess";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => {
                   <Route path="/" element={<Index />} />
                   <Route path="/merch" element={<MerchCatalog />} />
                   <Route path="/merch/:productId" element={<MerchProduct />} />
+                  <Route path="/booking/success" element={<BookingSuccess />} />
                   <Route path="/admin-login" element={<AdminLogin />} />
                   <Route
                     path="/admin"
