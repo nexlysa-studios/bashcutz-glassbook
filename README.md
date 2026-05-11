@@ -4,6 +4,24 @@
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
 
+## Supabase setup (bookings + admin)
+
+1. Create a Supabase project.
+2. In Supabase SQL Editor, run `supabase/schema.sql` from this repo.
+3. In Supabase Auth, create an admin user (email/password).
+4. Add these vars to `.env`:
+
+```sh
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+5. Restart the dev server.
+
+Notes:
+- Bookings, blocked days, and blocked time slots now persist in Supabase (not localStorage).
+- Admin login now uses Supabase Auth email/password.
+
 ## How can I edit this code?
 
 There are several ways of editing your application.

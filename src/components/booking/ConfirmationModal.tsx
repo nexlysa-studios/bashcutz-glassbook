@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { format } from 'date-fns';
 import { X, Check } from 'lucide-react';
 import { Service } from '../sections/ServicesSection';
+import { to12HourTime } from '@/lib/time';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -12,6 +13,8 @@ interface ConfirmationModalProps {
   date: Date;
   time: string;
   customerName: string;
+  paymentMethod: 'cash' | 'card';
+  firstTimeCutter: boolean;
 }
 
 export function ConfirmationModal({
@@ -22,6 +25,8 @@ export function ConfirmationModal({
   date,
   time,
   customerName,
+  paymentMethod,
+  firstTimeCutter,
 }: ConfirmationModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -54,12 +59,12 @@ export function ConfirmationModal({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-6 glass-overlay"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 md:items-center md:p-6 glass-overlay"
       onClick={onClose}
     >
       <div
         ref={modalRef}
-        className="glass-card w-full max-w-md p-8"
+        className="relative glass-card w-full max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto p-6 md:max-h-[calc(100vh-3rem)] md:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -98,13 +103,25 @@ export function ConfirmationModal({
           </div>
           <div className="flex justify-between py-3 border-b border-white/10">
             <span className="text-white/50">Time</span>
-            <span className="font-medium">{time}</span>
+            <span className="font-medium">{to12HourTime(time)}</span>
+          </div>
+          <div className="flex justify-between py-3 border-b border-white/10">
+            <span className="text-white/50">Payment</span>
+            <span className="font-medium">{paymentMethod.toUpperCase()}</span>
+          </div>
+          <div className="flex justify-between py-3 border-b border-white/10">
+            <span className="text-white/50">First Time Cutter</span>
+            <span className="font-medium">{firstTimeCutter ? 'Yes' : 'No'}</span>
           </div>
           <div className="flex justify-between py-3">
             <span className="text-white/50">Price</span>
             <span className="text-xl font-bold">R{service.price}</span>
           </div>
         </div>
+
+        <p className="mb-6 rounded-lg border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
+          By confirming this booking, you agree to pay a R80 cancellation fee if you cancel.
+        </p>
 
         {/* Actions */}
         <div className="flex gap-3">

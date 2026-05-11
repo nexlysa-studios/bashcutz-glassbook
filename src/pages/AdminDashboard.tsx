@@ -1,12 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
-import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock } from 'lucide-react';
+import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, LogOut } from 'lucide-react';
 import { GlassNavbar } from '../components/layout/GlassNavbar';
-import { useBooking, Booking } from '../context/BookingContext';
+import { useBooking, Booking, TIME_SLOTS } from '../context/BookingContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useSEO } from '@/hooks/useSEO';
+import { to12HourTime } from '@/lib/time';
 
 export default function AdminDashboard() {
-  const { bookings, cancelBooking, blockedDays, toggleBlockDay } = useBooking();
+  const { bookings, cancelBooking, blockedDays, toggleBlockDay, isLoading, error, isTimeSlotBlocked, toggleBlockTimeSlot } = useBooking();
+  useSEO({
+    title: 'Admin Dashboard | BASHCUTZ WorldWide',
+    description: 'Private booking dashboard for BASHCUTZ WorldWide.',
+    path: '/admin',
+    robots: 'noindex, nofollow',
+  });
+
+  const { logout } = useAdminAuth();
+  const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,9 +56,14 @@ export default function AdminDashboard() {
     .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
     .slice(0, 5);
 
-  const handleCancelBooking = (booking: Booking) => {
+  const handleCancelBooking = async (booking: Booking) => {
     if (confirm(`Cancel booking for ${booking.customerName}?`)) {
-      cancelBooking(booking.id);
+      try {
+        await cancelBooking(booking.id);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to cancel booking.';
+        alert(message);
+      }
     }
   };
 
@@ -55,14 +73,29 @@ export default function AdminDashboard() {
 
       <main className="pt-24 pb-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <span className="text-gold text-sm font-medium tracking-widest uppercase mb-2 block">
-              Dashboard
-            </span>
-            <h1 className="text-3xl md:text-4xl font-bold">Admin Panel</h1>
+          <div className="mb-8 flex items-center justify-between gap-4">
+            <div>
+              <span className="text-gold text-sm font-medium tracking-widest uppercase mb-2 block">
+                Dashboard
+              </span>
+              <h1 className="text-3xl md:text-4xl font-bold">Admin Panel</h1>
+            </div>
+            <button
+              onClick={async () => {
+                await logout();
+                navigate('/');
+              }}
+              className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
+            >
+              <LogOut className="h-4 w-4" />
+              Log out
+            </button>
           </div>
 
           {/* Stats Grid */}
+          {isLoading && <p className="mb-6 text-white/60">Loading bookings...</p>}
+          {error && !isLoading && <p className="mb-6 text-red-300">{error}</p>}
+
           <div className="grid gap-6 md:grid-cols-3 mb-8">
             <div className="admin-card glass-card p-6">
               <div className="flex items-center gap-4">
@@ -172,7 +205,14 @@ export default function AdminDashboard() {
               {selectedDate && (
                 <div className="mt-4 pt-4 border-t border-white/10">
                   <button
-                    onClick={() => toggleBlockDay(selectedDate)}
+                    onClick={async () => {
+                      try {
+                        await toggleBlockDay(selectedDate);
+                      } catch (err) {
+                        const message = err instanceof Error ? err.message : 'Failed to update blocked day.';
+                        alert(message);
+                      }
+                    }}
                     className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl transition-colors tap-feedback ${
                       blockedDays.includes(selectedDate)
                         ? 'bg-green-500/20 hover:bg-green-500/30 text-green-400'
@@ -191,6 +231,46 @@ export default function AdminDashboard() {
                       </>
                     )}
                   </button>
+
+                  <div className="mt-4">
+                    <p className="text-sm text-white/60 mb-3">
+                      Block Hours ({format(parseISO(selectedDate), 'MMM d')})
+                    </p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {TIME_SLOTS.map((time) => {
+                        const hasBooking = getBookingsForDate(selectedDate).some((booking) => booking.time === time);
+                        const blocked = isTimeSlotBlocked(selectedDate, time);
+
+                        return (
+                          <button
+                            key={time}
+                            type="button"
+                            disabled={hasBooking}
+                            onClick={async () => {
+                              try {
+                                await toggleBlockTimeSlot(selectedDate, time);
+                              } catch (err) {
+                                const message = err instanceof Error ? err.message : 'Failed to update blocked time slot.';
+                                alert(message);
+                              }
+                            }}
+                            className={`rounded-lg px-2 py-2 text-xs font-medium transition-colors ${
+                              hasBooking
+                                ? 'cursor-not-allowed bg-white/5 text-white/30'
+                                : blocked
+                                  ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30'
+                                  : 'bg-white/5 text-white/70 hover:bg-white/10'
+                            }`}
+                          >
+                            {to12HourTime(time)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="mt-2 text-xs text-white/40">
+                      Red = blocked, dim = booked
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -219,7 +299,7 @@ export default function AdminDashboard() {
                           <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
                             <span className="text-gold">{booking.service.name}</span>
                             <span>•</span>
-                            <span>{booking.time}</span>
+                            <span>{to12HourTime(booking.time)}</span>
                             {!selectedDate && (
                               <>
                                 <span>•</span>
@@ -229,7 +309,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <button
-                          onClick={() => handleCancelBooking(booking)}
+                          onClick={() => void handleCancelBooking(booking)}
                           className="p-2 rounded-lg hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-colors tap-feedback"
                         >
                           <X className="w-5 h-5" />

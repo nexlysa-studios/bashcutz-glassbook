@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { FloatingElements } from '../effects/FloatingElements';
 
 interface HeroSectionProps {
   onBookNow: () => void;
@@ -8,147 +7,74 @@ interface HeroSectionProps {
 
 export function HeroSection({ onBookNow }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
+  const titleLineRef = useRef<HTMLSpanElement>(null);
+  const worldWideRef = useRef<HTMLSpanElement>(null);
   const subheadlineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLButtonElement>(null);
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Initial setup - hide elements
-      gsap.set([headlineRef.current, subheadlineRef.current, ctaRef.current, scrollIndicatorRef.current], {
-        opacity: 0,
-      });
+      // Create timeline for entrance animations
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Animated background glow
-      gsap.to(glowRef.current, {
-        scale: 1.2,
-        opacity: 0.4,
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
-
-      // Split headline into characters for staggered animation
-      const headline = headlineRef.current;
-      if (headline) {
-        const text = headline.innerHTML;
-        const mainText = 'BASHCUTZ';
-        const chars = mainText.split('').map((char, i) => 
-          `<span class="char inline-block" style="opacity: 0; transform: translateY(100px) rotateX(-90deg);">${char}</span>`
-        ).join('');
-        
-        // Keep the WorldWide span
-        headline.innerHTML = `<span class="main-text">${chars}</span><span class="world-wide block text-3xl md:text-4xl lg:text-5xl font-light mt-2 tracking-widest" style="opacity: 0; transform: translateY(50px);">WorldWide</span>`;
-
-        const charElements = headline.querySelectorAll('.char');
-        const worldWide = headline.querySelector('.world-wide');
-
-        // Master timeline
-        const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-
-        // Staggered character reveal
-        tl.to(charElements, {
+      tl.fromTo(
+        [titleLineRef.current, worldWideRef.current],
+        { opacity: 0, x: -180, y: 20, filter: 'blur(10px)' },
+        {
           opacity: 1,
+          x: 0,
           y: 0,
-          rotateX: 0,
-          duration: 1.2,
-          stagger: 0.08,
-        })
-        .to(worldWide, {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-        }, '-=0.6')
+          filter: 'blur(0px)',
+          duration: 1.1,
+          stagger: 0.15,
+        }
+      )
         .fromTo(
           subheadlineRef.current,
-          { opacity: 0, y: 30, filter: 'blur(10px)' },
-          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8 },
-          '-=0.4'
+          { opacity: 0, y: 24, letterSpacing: '0.6em' },
+          { opacity: 1, y: 0, letterSpacing: '0.3em', duration: 0.9 },
+          '-=0.5'
         )
         .fromTo(
           ctaRef.current,
-          { opacity: 0, y: 20, scale: 0.9 },
-          { 
-            opacity: 1, 
-            y: 0, 
-            scale: 1, 
-            duration: 0.6,
-            ease: 'elastic.out(1, 0.8)',
-          },
-          '-=0.3'
-        )
-        .fromTo(
-          scrollIndicatorRef.current,
-          { opacity: 0, y: -20 },
-          { opacity: 0.4, y: 0, duration: 0.6 },
-          '-=0.2'
+          { opacity: 0, y: 18, scale: 0.96 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.6 },
+          '-=0.35'
         );
-
-        // Continuous scroll indicator animation
-        gsap.to(scrollIndicatorRef.current?.querySelector('.scroll-line'), {
-          scaleY: 0,
-          transformOrigin: 'top',
-          duration: 1.5,
-          repeat: -1,
-          ease: 'power2.inOut',
-        });
-      }
-
-      // CTA hover animation
-      const cta = ctaRef.current;
-      if (cta) {
-        cta.addEventListener('mouseenter', () => {
-          gsap.to(cta, {
-            scale: 1.05,
-            boxShadow: '0 0 40px rgba(255, 215, 0, 0.4)',
-            duration: 0.3,
-            ease: 'power2.out',
-          });
-        });
-        
-        cta.addEventListener('mouseleave', () => {
-          gsap.to(cta, {
-            scale: 1,
-            boxShadow: '0 0 0px rgba(255, 215, 0, 0)',
-            duration: 0.3,
-            ease: 'power2.out',
-          });
-        });
-      }
-
     }, containerRef);
 
     return () => ctx.revert();
   }, []);
 
-  // Mouse move parallax effect
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const { clientX, clientY } = e;
-      const x = (clientX / window.innerWidth - 0.5) * 20;
-      const y = (clientY / window.innerHeight - 0.5) * 20;
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
-      gsap.to(headlineRef.current, {
-        x: x * 0.5,
-        y: y * 0.5,
-        duration: 1,
-        ease: 'power2.out',
-      });
-
-      gsap.to(glowRef.current, {
-        x: x * 2,
-        y: y * 2,
-        duration: 1.5,
-        ease: 'power2.out',
-      });
+    const keepPlaying = () => {
+      if (document.visibilityState === 'visible' && videoEl.paused) {
+        void videoEl.play().catch(() => {
+          // Ignore autoplay race conditions; browser will retry on next visibility/pause event.
+        });
+      }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    // Kick playback and force-resume if mobile browser pauses the hero video.
+    keepPlaying();
+    videoEl.addEventListener('pause', keepPlaying);
+    document.addEventListener('visibilitychange', keepPlaying);
+
+    return () => {
+      videoEl.removeEventListener('pause', keepPlaying);
+      document.removeEventListener('visibilitychange', keepPlaying);
+    };
   }, []);
+
+  // Use encodeURIComponent on the raw filename (without leading slash)
+  // so characters like `#` and emojis are percent-encoded correctly.
+  const rawVideoFile = 'Day in the life 💋💈barber - @bash.cutz 💈#bashcutz #fyp #barber #hair #new #reels #2025 #trendi.mp4';
+  const videoSrc = `/video/${encodeURIComponent(rawVideoFile)}`;
 
   return (
     <section
@@ -156,59 +82,60 @@ export function HeroSection({ onBookNow }: HeroSectionProps) {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-neutral-950 to-black" />
-      
-      {/* Animated glow */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-slate-50 to-white dark:from-black dark:via-neutral-950 dark:to-black" />
+
+      {/* Background Video (mobile only) */}
+      <video
+        ref={videoRef}
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none md:hidden"
+        src="/Hero-Mobile.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        controls={false}
+        disablePictureInPicture
+        disableRemotePlayback
+        controlsList="nodownload nofullscreen noplaybackrate noremoteplayback"
+        preload="auto"
+        aria-hidden="true"
+      />
+
+      {/* Subtle radial gradient overlay */}
       <div 
-        ref={glowRef}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20"
+        className="absolute inset-0 opacity-30"
         style={{
-          background: 'radial-gradient(circle, hsl(var(--gold)) 0%, transparent 50%)',
-          filter: 'blur(80px)',
+          background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)'
         }}
       />
 
-      {/* Floating elements */}
-      <FloatingElements />
-
-      {/* Grain overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.015] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
+      {/* Glass overlay for content */}
+      <div className="absolute inset-0 bg-transparent dark:bg-black/20 backdrop-blur-[2px]" />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
         <h1
           ref={headlineRef}
-          className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-8"
-          style={{
-            background: 'linear-gradient(180deg, #FFD700 0%, #FFA500 40%, #ffffff 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            perspective: '1000px',
-          }}
+          className="text-[clamp(3.25rem,11vw,4.75rem)] sm:text-6xl md:text-8xl lg:text-9xl font-rammetto font-bold tracking-[0.01em] sm:tracking-tight mb-6"
         >
-          BASHCUTZ
-          <span 
-            className="block text-3xl md:text-4xl lg:text-5xl font-light mt-2 tracking-widest"
-            style={{
-              background: 'linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
+          <span ref={titleLineRef} className="block opacity-0">
+            <span className="bg-gradient-to-b from-amber-700 via-amber-600 to-neutral-900 dark:from-yellow-300 dark:via-amber-400 dark:to-white bg-clip-text text-transparent">
+              BASHCUTZ
+            </span>
+          </span>
+          <span
+            ref={worldWideRef}
+            className="block text-4xl md:text-5xl lg:text-6xl font-light mt-2 tracking-widest opacity-0"
           >
-            WorldWide
+            <span className="bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-400 bg-clip-text text-transparent">
+              WorldWide
+            </span>
           </span>
         </h1>
 
         <p
           ref={subheadlineRef}
-          className="text-lg md:text-2xl text-white/60 font-light tracking-[0.4em] uppercase mb-14"
+          className="text-lg md:text-xl text-foreground/60 dark:text-white/60 font-light tracking-[0.3em] uppercase mb-12 opacity-0"
         >
           Precision <span className="text-gold">·</span> Style <span className="text-gold">·</span> Confidence
         </p>
@@ -216,41 +143,16 @@ export function HeroSection({ onBookNow }: HeroSectionProps) {
         <button
           ref={ctaRef}
           onClick={onBookNow}
-          className="magnetic relative px-12 py-5 bg-gradient-to-r from-gold via-yellow-500 to-gold text-black font-bold text-lg tracking-wider rounded-full overflow-hidden group tap-feedback"
+          className="glass-button-primary hero-cta-orange text-lg tracking-wide tap-feedback opacity-0"
         >
-          <span className="relative z-10">Book Now</span>
-          <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+          Book Now
         </button>
       </div>
 
       {/* Scroll indicator */}
-      <div 
-        ref={scrollIndicatorRef}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
-      >
-        <span className="text-xs tracking-[0.3em] uppercase text-white/40">Scroll</span>
-        <div className="scroll-line w-px h-12 bg-gradient-to-b from-gold/60 to-transparent" />
-      </div>
-
-      {/* Side decorations */}
-      <div className="absolute left-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-4">
-        {[...Array(5)].map((_, i) => (
-          <div 
-            key={i}
-            className="w-1 h-8 rounded-full bg-white/10 animate-pulse"
-            style={{ animationDelay: `${i * 0.2}s` }}
-          />
-        ))}
-      </div>
-      <div className="absolute right-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-4">
-        {[...Array(5)].map((_, i) => (
-          <div 
-            key={i}
-            className="w-1 h-8 rounded-full bg-white/10 animate-pulse"
-            style={{ animationDelay: `${i * 0.2 + 0.5}s` }}
-          />
-        ))}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
+        <span className="text-xs tracking-widest uppercase text-foreground/60 dark:text-white/60">Scroll</span>
+        <div className="w-px h-8 bg-gradient-to-b from-foreground/60 dark:from-white to-transparent" />
       </div>
     </section>
   );

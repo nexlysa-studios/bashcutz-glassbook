@@ -3,28 +3,37 @@ import { z } from 'zod';
 
 const customerSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
-  phone: z.string().trim().min(10, 'Enter a valid phone number').max(15, 'Phone number too long'),
+  phone: z.string().trim().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
+  paymentMethod: z.enum(['cash', 'card'], { required_error: 'Select a payment method' }),
+  firstTimeCutter: z.enum(['yes', 'no'], { required_error: 'Select yes or no' }),
 });
 
 interface CustomerFormProps {
-  onSubmit: (data: { name: string; phone: string }) => void;
+  onSubmit: (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean }) => void;
   onBack: () => void;
 }
 
 export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | ''>('');
+  const [firstTimeCutter, setFirstTimeCutter] = useState<'yes' | 'no' | ''>('');
+  const [errors, setErrors] = useState<{ name?: string; phone?: string; paymentMethod?: string; firstTimeCutter?: string }>({});
+
+  const handlePhoneChange = (value: string) => {
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+    setPhone(digitsOnly);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const result = customerSchema.safeParse({ name, phone });
+    const result = customerSchema.safeParse({ name, phone, paymentMethod, firstTimeCutter });
     
     if (!result.success) {
-      const fieldErrors: { name?: string; phone?: string } = {};
+      const fieldErrors: { name?: string; phone?: string; paymentMethod?: string; firstTimeCutter?: string } = {};
       result.error.errors.forEach((err) => {
-        const field = err.path[0] as 'name' | 'phone';
+        const field = err.path[0] as 'name' | 'phone' | 'paymentMethod' | 'firstTimeCutter';
         fieldErrors[field] = err.message;
       });
       setErrors(fieldErrors);
@@ -32,7 +41,20 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
     }
 
     setErrors({});
-    onSubmit({ name: result.data.name, phone: result.data.phone });
+    onSubmit({
+      name: result.data.name,
+      phone: result.data.phone,
+      paymentMethod: result.data.paymentMethod,
+      firstTimeCutter: result.data.firstTimeCutter === 'yes',
+    });
+  };
+
+  const selectPaymentMethod = (method: 'cash' | 'card') => {
+    setPaymentMethod(method);
+  };
+
+  const selectFirstTimeCutter = (value: 'yes' | 'no') => {
+    setFirstTimeCutter(value);
   };
 
   return (
@@ -60,13 +82,73 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
           <input
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => handlePhoneChange(e.target.value)}
             placeholder="Enter your phone number"
             className="glass-input"
-            maxLength={15}
+            maxLength={10}
+            inputMode="numeric"
+            pattern="[0-9]{10}"
           />
           {errors.phone && (
             <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm text-white/60 mb-2">Payment Method</label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onTouchStart={() => selectPaymentMethod('cash')}
+              onMouseDown={() => selectPaymentMethod('cash')}
+              onPointerDown={() => selectPaymentMethod('cash')}
+              onClick={() => selectPaymentMethod('cash')}
+              className={`glass-button tap-feedback ${paymentMethod === 'cash' ? '!bg-amber-500/20 !border-amber-300/60 !text-white !shadow-[0_0_12px_rgba(255,193,7,0.35)]' : 'text-white/70'}`}
+            >
+              Cash
+            </button>
+            <button
+              type="button"
+              onTouchStart={() => selectPaymentMethod('card')}
+              onMouseDown={() => selectPaymentMethod('card')}
+              onPointerDown={() => selectPaymentMethod('card')}
+              onClick={() => selectPaymentMethod('card')}
+              className={`glass-button tap-feedback ${paymentMethod === 'card' ? '!bg-amber-500/20 !border-amber-300/60 !text-white !shadow-[0_0_12px_rgba(255,193,7,0.35)]' : 'text-white/70'}`}
+            >
+              Card
+            </button>
+          </div>
+          {errors.paymentMethod && (
+            <p className="text-red-400 text-sm mt-2">{errors.paymentMethod}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm text-white/60 mb-2">First Time At BashCutz?</label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onTouchStart={() => selectFirstTimeCutter('yes')}
+              onMouseDown={() => selectFirstTimeCutter('yes')}
+              onPointerDown={() => selectFirstTimeCutter('yes')}
+              onClick={() => selectFirstTimeCutter('yes')}
+              className={`glass-button tap-feedback ${firstTimeCutter === 'yes' ? '!bg-amber-500/20 !border-amber-300/60 !text-white !shadow-[0_0_12px_rgba(255,193,7,0.35)]' : 'text-white/70'}`}
+            >
+              Yes
+            </button>
+            <button
+              type="button"
+              onTouchStart={() => selectFirstTimeCutter('no')}
+              onMouseDown={() => selectFirstTimeCutter('no')}
+              onPointerDown={() => selectFirstTimeCutter('no')}
+              onClick={() => selectFirstTimeCutter('no')}
+              className={`glass-button tap-feedback ${firstTimeCutter === 'no' ? '!bg-amber-500/20 !border-amber-300/60 !text-white !shadow-[0_0_12px_rgba(255,193,7,0.35)]' : 'text-white/70'}`}
+            >
+              No
+            </button>
+          </div>
+          {errors.firstTimeCutter && (
+            <p className="text-red-400 text-sm mt-2">{errors.firstTimeCutter}</p>
           )}
         </div>
 
@@ -89,3 +171,4 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-
+import tailwindcssAnimate from "tailwindcss-animate";
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
@@ -14,7 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+        sans: ['Sora', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+        display: ['"Bebas Neue"', 'Sora', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+        knewave: ['"Knewave"', 'Sora', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+        story: ['"Story Script"', '"Knewave"', 'Sora', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+        rammetto: ['"Rammetto One"', 'Sora', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -146,5 +150,7 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;
+
+

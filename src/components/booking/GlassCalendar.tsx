@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, isBefore, startOfDay } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, isBefore, isAfter, startOfDay } from 'date-fns';
 import { useBooking } from '../../context/BookingContext';
 
 interface GlassCalendarProps {
@@ -11,6 +11,10 @@ interface GlassCalendarProps {
 export function GlassCalendar({ selectedDate, onSelectDate }: GlassCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const { isDayFullyBooked, isDayBlocked } = useBooking();
+  const today = startOfDay(new Date());
+  const firstAllowedMonth = startOfMonth(today);
+  const lastAllowedMonth = startOfMonth(addMonths(today, 1));
+  const lastAllowedDate = endOfMonth(lastAllowedMonth);
 
   const days = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -21,16 +25,20 @@ export function GlassCalendar({ selectedDate, onSelectDate }: GlassCalendarProps
   const startDay = startOfMonth(currentMonth).getDay();
 
   const goToPreviousMonth = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
+    if (!isSameMonth(currentMonth, firstAllowedMonth)) {
+      setCurrentMonth(subMonths(currentMonth, 1));
+    }
   };
 
   const goToNextMonth = () => {
-    setCurrentMonth(addMonths(currentMonth, 1));
+    if (!isSameMonth(currentMonth, lastAllowedMonth)) {
+      setCurrentMonth(addMonths(currentMonth, 1));
+    }
   };
 
   const isDateDisabled = (date: Date): boolean => {
-    const today = startOfDay(new Date());
     if (isBefore(date, today)) return true;
+    if (isAfter(date, lastAllowedDate)) return true;
     
     // Check if weekend (optional - uncomment if barber doesn't work weekends)
     // const dayOfWeek = date.getDay();
@@ -46,6 +54,7 @@ export function GlassCalendar({ selectedDate, onSelectDate }: GlassCalendarProps
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={goToPreviousMonth}
+          disabled={isSameMonth(currentMonth, firstAllowedMonth)}
           className="p-2 rounded-lg hover:bg-white/10 transition-colors tap-feedback"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -55,6 +64,7 @@ export function GlassCalendar({ selectedDate, onSelectDate }: GlassCalendarProps
         </h3>
         <button
           onClick={goToNextMonth}
+          disabled={isSameMonth(currentMonth, lastAllowedMonth)}
           className="p-2 rounded-lg hover:bg-white/10 transition-colors tap-feedback"
         >
           <ChevronRight className="w-5 h-5" />
