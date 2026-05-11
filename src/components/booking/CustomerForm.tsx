@@ -4,19 +4,19 @@ import { z } from 'zod';
 const customerSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
   phone: z.string().trim().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
-  paymentMethod: z.enum(['cash', 'card'], { required_error: 'Select a payment method' }),
+  paymentMethod: z.enum(['cash', 'card', 'online'], { required_error: 'Select a payment method' }),
   firstTimeCutter: z.enum(['yes', 'no'], { required_error: 'Select yes or no' }),
 });
 
 interface CustomerFormProps {
-  onSubmit: (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean }) => void;
+  onSubmit: (data: { name: string; phone: string; paymentMethod: 'cash' | 'card' | 'online'; firstTimeCutter: boolean }) => void;
   onBack: () => void;
 }
 
 export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | ''>('');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'online' | ''>('');
   const [firstTimeCutter, setFirstTimeCutter] = useState<'yes' | 'no' | ''>('');
   const [errors, setErrors] = useState<{ name?: string; phone?: string; paymentMethod?: string; firstTimeCutter?: string }>({});
 
@@ -49,7 +49,7 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
     });
   };
 
-  const selectPaymentMethod = (method: 'cash' | 'card') => {
+  const selectPaymentMethod = (method: 'cash' | 'card' | 'online') => {
     setPaymentMethod(method);
   };
 
@@ -118,6 +118,22 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
               Card
             </button>
           </div>
+          <button
+            type="button"
+            onTouchStart={() => selectPaymentMethod('online')}
+            onMouseDown={() => selectPaymentMethod('online')}
+            onPointerDown={() => selectPaymentMethod('online')}
+            onClick={() => selectPaymentMethod('online')}
+            className={`glass-button tap-feedback w-full mt-3 flex items-center justify-center gap-2 ${paymentMethod === 'online' ? '!bg-amber-500/20 !border-amber-300/60 !text-white !shadow-[0_0_12px_rgba(255,193,7,0.35)]' : 'text-white/70'}`}
+          >
+            <span>Pay Online</span>
+            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 border border-white/20">Yoco · Secure</span>
+          </button>
+          {paymentMethod === 'online' && (
+            <p className="text-xs text-white/50 mt-2">
+              You'll be redirected to Yoco's secure checkout after confirming.
+            </p>
+          )}
           {errors.paymentMethod && (
             <p className="text-red-400 text-sm mt-2">{errors.paymentMethod}</p>
           )}

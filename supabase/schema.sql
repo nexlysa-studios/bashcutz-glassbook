@@ -10,10 +10,34 @@ create table if not exists public.bookings (
   time text not null,
   customer_name text not null,
   customer_phone text not null,
-  payment_method text not null check (payment_method in ('cash', 'card')),
+  payment_method text not null check (payment_method in ('cash', 'card', 'online')),
+  -- Yoco online payment fields (nullable; only used when payment_method = 'online')
+  payment_status text not null default 'unpaid' check (payment_status in ('unpaid', 'pending', 'paid', 'failed', 'cancelled')),
+  payment_reference text,        -- Yoco checkout id (ch_...)
+  payment_amount_cents integer,  -- amount in cents (ZAR)
+  paid_at timestamptz,
   created_at timestamptz not null default now(),
   constraint bookings_date_time_unique unique (date, time)
 );
+
+-- Migration helpers for existing installs:
+alter table public.bookings
+  drop constraint if exists bookings_payment_method_check;
+alter table public.bookings
+  add constraint bookings_payment_method_check
+  check (payment_method in ('cash', 'card', 'online'));
+
+alter table public.bookings add column if not exists payment_status text not null default 'unpaid';
+alter table public.bookings
+  drop constraint if exists bookings_payment_status_check;
+alter table public.bookings
+  add constraint bookings_payment_status_check
+  check (payment_status in ('unpaid', 'pending', 'paid', 'failed', 'cancelled'));
+alter table public.bookings add column if not exists payment_reference text;
+alter table public.bookings add column if not exists payment_amount_cents integer;
+alter table public.bookings add column if not exists paid_at timestamptz;
+
+create index if not exists bookings_payment_reference_idx on public.bookings (payment_reference);
 
 create table if not exists public.blocked_days (
   date date primary key,
@@ -81,3 +105,7 @@ for all
 to authenticated
 using (true)
 with check (true);
+
+-- NOTE: Booking payment_status is updated by the `yoco-webhook` edge function
+-- using the SUPABASE_SERVICE_ROLE_KEY, which bypasses RLS. No extra UPDATE policy
+-- for anon/authenticated users is needed.
