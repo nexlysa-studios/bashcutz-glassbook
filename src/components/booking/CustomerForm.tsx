@@ -4,19 +4,19 @@ import { z } from 'zod';
 const customerSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
   phone: z.string().trim().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
-  paymentMethod: z.enum(['cash', 'card'], { required_error: 'Select a payment method' }),
+  paymentMethod: z.enum(['cash', 'card', 'online'], { required_error: 'Select a payment method' }),
   firstTimeCutter: z.enum(['yes', 'no'], { required_error: 'Select yes or no' }),
 });
 
 interface CustomerFormProps {
-  onSubmit: (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean }) => void;
+  onSubmit: (data: { name: string; phone: string; paymentMethod: 'cash' | 'card' | 'online'; firstTimeCutter: boolean }) => void;
   onBack: () => void;
 }
 
 export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | ''>('');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'online' | ''>('');
   const [firstTimeCutter, setFirstTimeCutter] = useState<'yes' | 'no' | ''>('');
   const [errors, setErrors] = useState<{ name?: string; phone?: string; paymentMethod?: string; firstTimeCutter?: string }>({});
 
@@ -49,7 +49,7 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
     });
   };
 
-  const selectPaymentMethod = (method: 'cash' | 'card') => {
+  const selectPaymentMethod = (method: 'cash' | 'card' | 'online') => {
     setPaymentMethod(method);
   };
 
