@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GlassNavbar } from '@/components/layout/GlassNavbar';
-import { createMerchWhatsAppLink, getMerchItemById } from '@/lib/merch';
+import { getMerchItemById } from '@/lib/merch';
 import { useSEO } from '@/hooks/useSEO';
+import { MerchCheckoutModal } from '@/components/merch/MerchCheckoutModal';
 import NotFound from './NotFound';
 
 const MerchProduct = () => {
@@ -11,6 +12,7 @@ const MerchProduct = () => {
   const item = productId ? getMerchItemById(productId) : undefined;
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('XL');
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
 
   const gallery = useMemo(() => item?.thumbnails ?? [], [item]);
