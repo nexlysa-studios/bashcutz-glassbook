@@ -5,7 +5,7 @@
 //   YOCO_SECRET_KEY     - your Yoco secret key (e.g. sk_test_...)
 //   SUPABASE_URL        - auto-injected by Supabase
 //   SUPABASE_SERVICE_ROLE_KEY - auto-injected by Supabase
-//   PUBLIC_SITE_URL     - your site origin (e.g. https://bashcutz.com) used for return URLs
+//   PUBLIC_SITE_URL     - your site origin (e.g. https://bashcutz.co.za) used for return URLs
 //
 // Deploy:
 //   supabase functions deploy yoco-create-checkout --no-verify-jwt
