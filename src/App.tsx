@@ -14,6 +14,7 @@ import MerchCatalog from "./pages/MerchCatalog";
 import MerchProduct from "./pages/MerchProduct";
 import NotFound from "./pages/NotFound";
 import BookingSuccess from "./pages/BookingSuccess";
+import MerchSuccess from "./pages/MerchSuccess";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ const App = () => {
                   <Route path="/merch" element={<MerchCatalog />} />
                   <Route path="/merch/:productId" element={<MerchProduct />} />
                   <Route path="/booking/success" element={<BookingSuccess />} />
+                  <Route path="/merch/success" element={<MerchSuccess />} />
                   <Route path="/admin-login" element={<AdminLogin />} />
                   <Route
                     path="/admin"

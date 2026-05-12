@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GlassNavbar } from '@/components/layout/GlassNavbar';
-import { createMerchWhatsAppLink, getMerchItemById } from '@/lib/merch';
+import { getMerchItemById } from '@/lib/merch';
 import { useSEO } from '@/hooks/useSEO';
+import { MerchCheckoutModal } from '@/components/merch/MerchCheckoutModal';
 import NotFound from './NotFound';
 
 const MerchProduct = () => {
@@ -11,6 +12,7 @@ const MerchProduct = () => {
   const item = productId ? getMerchItemById(productId) : undefined;
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('XL');
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
 
   const gallery = useMemo(() => item?.thumbnails ?? [], [item]);
@@ -136,14 +138,13 @@ const MerchProduct = () => {
                 </div>
               </div>
 
-              <a
-                href={createMerchWhatsAppLink(item, selectedSize)}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                type="button"
+                onClick={() => setCheckoutOpen(true)}
                 className="mb-6 inline-flex h-11 min-w-[150px] items-center justify-center border border-black bg-white px-5 text-xs uppercase tracking-[0.16em] text-black transition-colors hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black"
               >
-                Order on WhatsApp
-              </a>
+                Buy Now
+              </button>
 
               <ul className="mb-10 list-disc space-y-1 pl-4 text-xs leading-5 tracking-[0.02em] sm:text-sm">
                 {item.features.map((feature) => (
@@ -203,6 +204,13 @@ const MerchProduct = () => {
           </p>
         </div>
       </footer>
+
+      <MerchCheckoutModal
+        isOpen={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        item={item}
+        size={selectedSize}
+      />
     </div>
   );
 };
