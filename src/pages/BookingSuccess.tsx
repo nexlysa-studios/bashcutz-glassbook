@@ -157,6 +157,23 @@ export default function BookingSuccess() {
           </>
         )}
 
+        {!polling && status === 'pending' && (
+          <>
+            <Loader2 className="w-12 h-12 mx-auto mb-4 text-amber-400" />
+            <h1 className="text-2xl font-bold mb-2">Still Confirming…</h1>
+            <p className="text-white/70 mb-6">
+              Your payment is taking longer than expected. If money was deducted, your booking will be confirmed shortly. You can refresh this page or contact us on WhatsApp.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="glass-button-primary mr-2"
+            >
+              Refresh
+            </button>
+            <Link to="/" className="glass-button-secondary inline-block">Back Home</Link>
+          </>
+        )}
+
         {error && <p className="text-red-400 mt-4 text-sm">{error}</p>}
       </div>
     </main>
