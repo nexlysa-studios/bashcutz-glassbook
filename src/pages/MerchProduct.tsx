@@ -204,6 +204,13 @@ const MerchProduct = () => {
           </p>
         </div>
       </footer>
+
+      <MerchCheckoutModal
+        isOpen={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        item={item}
+        size={selectedSize}
+      />
     </div>
   );
 };
