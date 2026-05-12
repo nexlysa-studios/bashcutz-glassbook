@@ -102,6 +102,8 @@ Deno.serve(async (req) => {
     const payload = event?.payload ?? {};
     const metadata = payload?.metadata ?? {};
     const bookingId: string | undefined = metadata?.bookingId;
+    const orderId: string | undefined = metadata?.orderId;
+    const orderType: string | undefined = metadata?.orderType;
     const checkoutId: string | undefined =
       payload?.metadata?.checkoutId ?? payload?.checkoutId ?? payload?.id;
 
@@ -116,17 +118,32 @@ Deno.serve(async (req) => {
       const update: Record<string, unknown> = { payment_status: newStatus };
       if (newStatus === "paid") update.paid_at = new Date().toISOString();
 
-      let query = admin.from("bookings").update(update);
-      if (bookingId) {
-        query = query.eq("id", bookingId);
+      // Determine which table to update
+      const isMerch = orderType === "merch" || !!orderId;
+      const table = isMerch ? "merch_orders" : "bookings";
+      const refId = isMerch ? orderId : bookingId;
+
+      let query = admin.from(table).update(update);
+      if (refId) {
+        query = query.eq("id", refId);
       } else if (checkoutId) {
-        query = query.eq("payment_reference", checkoutId);
+        // Fall back to checkout reference. Try bookings first, then merch_orders.
+        const { data: bk } = await admin
+          .from("bookings")
+          .select("id")
+          .eq("payment_reference", checkoutId)
+          .maybeSingle();
+        if (bk) {
+          query = admin.from("bookings").update(update).eq("payment_reference", checkoutId);
+        } else {
+          query = admin.from("merch_orders").update(update).eq("payment_reference", checkoutId);
+        }
       } else {
-        return new Response("No booking reference on event", { status: 200, headers: corsHeaders });
+        return new Response("No reference on event", { status: 200, headers: corsHeaders });
       }
       const { error } = await query;
       if (error) {
-        console.error("Failed to update booking", error);
+        console.error("Failed to update row", error);
         return new Response("DB update failed", { status: 500, headers: corsHeaders });
       }
     }
