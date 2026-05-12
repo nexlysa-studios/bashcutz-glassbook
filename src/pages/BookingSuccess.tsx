@@ -37,10 +37,35 @@ export default function BookingSuccess() {
       return;
     }
     const supabase = getSupabaseClient();
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
     let cancelled = false;
     let attempts = 0;
+
+    const verifyWithYoco = async () => {
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/yoco-verify-payment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${anonKey}`,
+            apikey: anonKey,
+          },
+          body: JSON.stringify({ bookingId }),
+        });
+      } catch (err) {
+        console.warn('yoco-verify-payment failed', err);
+      }
+    };
+
     const tick = async () => {
       attempts += 1;
+      // Ask the edge function to reconcile with Yoco directly (covers webhook delays/failures)
+      // Run on attempt 1 and then every 3 attempts.
+      if (attempts === 1 || attempts % 3 === 0) {
+        await verifyWithYoco();
+      }
+
       const { data, error: e } = await supabase
         .from('bookings')
         .select('id, service, date, time, customer_name, customer_phone, payment_method, payment_status')
@@ -59,7 +84,7 @@ export default function BookingSuccess() {
       }
       setBooking(data as BookingRow);
       const finalised = data.payment_status === 'paid' || data.payment_status === 'failed' || data.payment_status === 'cancelled';
-      if (finalised || attempts > 20) {
+      if (finalised || attempts > 30) {
         setPolling(false);
       } else {
         setTimeout(tick, 2000);
@@ -129,6 +154,23 @@ export default function BookingSuccess() {
             </h1>
             <p className="text-white/70 mb-6">No charge was made. You can try again or pick a different payment method.</p>
             <button onClick={() => navigate('/')} className="glass-button-primary">Try Again</button>
+          </>
+        )}
+
+        {!polling && status === 'pending' && (
+          <>
+            <Loader2 className="w-12 h-12 mx-auto mb-4 text-amber-400" />
+            <h1 className="text-2xl font-bold mb-2">Still Confirming…</h1>
+            <p className="text-white/70 mb-6">
+              Your payment is taking longer than expected. If money was deducted, your booking will be confirmed shortly. You can refresh this page or contact us on WhatsApp.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="glass-button-primary mr-2"
+            >
+              Refresh
+            </button>
+            <Link to="/" className="glass-button-secondary inline-block">Back Home</Link>
           </>
         )}
 
