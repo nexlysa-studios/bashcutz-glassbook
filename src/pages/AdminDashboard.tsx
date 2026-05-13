@@ -368,6 +368,72 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Recent Merch Orders (last 7 days) */}
+          <div className="admin-card glass-card p-6 mt-8">
+            <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <ShoppingBag className="w-5 h-5 text-gold" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">Recent Merch Orders</h2>
+                  <p className="text-xs text-white/40">Last 7 days</p>
+                </div>
+              </div>
+              <Link
+                to="/admin/merch-orders"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold hover:opacity-80"
+              >
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {merchLoading ? (
+              <p className="text-white/40 text-sm py-4 text-center">Loading…</p>
+            ) : recentMerch.length === 0 ? (
+              <p className="text-white/40 text-sm py-4 text-center">No merch orders in the last 7 days.</p>
+            ) : (
+              <div className="space-y-3 max-h-[400px] overflow-y-auto scrollbar-hide">
+                {recentMerch.map((o) => {
+                  const total = o.payment_amount_cents ?? o.unit_price_cents * o.quantity;
+                  const badge =
+                    o.payment_status === 'paid'
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                      : o.payment_status === 'pending'
+                        ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30'
+                        : o.payment_status === 'failed' || o.payment_status === 'cancelled'
+                          ? 'bg-red-500/20 text-red-300 border-red-400/30'
+                          : 'bg-white/10 text-white/60 border-white/20';
+                  return (
+                    <div key={o.id} className="glass-card p-4 flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium">{o.customer_name}</p>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${badge}`}>
+                            {o.payment_status}
+                          </span>
+                        </div>
+                        <p className="text-sm text-white/50">{o.customer_phone}</p>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-white/40">
+                          <span className="text-gold">{o.product_name}</span>
+                          <span>•</span>
+                          <span>Size {o.size}</span>
+                          <span>•</span>
+                          <span>Qty {o.quantity}</span>
+                          <span>•</span>
+                          <span>{format(parseISO(o.created_at), 'MMM d, HH:mm')}</span>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-base font-bold text-gold">{formatRand(total)}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
