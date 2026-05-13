@@ -15,7 +15,6 @@ interface MerchCheckoutModalProps {
 const customerSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100),
   phone: z.string().trim().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
-  address: z.string().trim().min(5, 'Please enter a delivery address').max(500),
 });
 
 type Step = 'details' | 'confirm' | 'submitting';
