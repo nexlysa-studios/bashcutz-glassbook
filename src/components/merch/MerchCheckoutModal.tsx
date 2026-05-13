@@ -55,7 +55,7 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const result = customerSchema.safeParse({ name, phone, address });
+    const result = customerSchema.safeParse({ name, phone });
     if (!result.success) {
       const fieldErrors: typeof errors = {};
       result.error.errors.forEach((err) => {
@@ -93,7 +93,6 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
           unit_price_cents: Math.round(item.price * 100),
           customer_name: name,
           customer_phone: phone,
-          customer_address: address,
         })
         .select('id')
         .single();
@@ -102,13 +101,7 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
         throw new Error(insertErr?.message || 'Could not create order.');
       }
 
-      // 2. Persist details for the success page WhatsApp message
-      sessionStorage.setItem(
-        `bashcutz_merch_${order.id}`,
-        JSON.stringify({ address }),
-      );
-
-      // 3. Create Yoco checkout
+      // 2. Create Yoco checkout
       const res = await fetch(`${supabaseUrl}/functions/v1/yoco-create-merch-checkout`, {
         method: 'POST',
         headers: {
@@ -191,17 +184,11 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
                 />
                 {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
               </div>
-              <div>
-                <label className="block text-xs uppercase tracking-[0.14em] text-white/60 mb-2">Delivery Address</label>
-                <textarea
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  rows={3}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-gold/60"
-                  placeholder="Street, suburb, city, postal code"
-                  required
-                />
-                {errors.address && <p className="text-red-400 text-xs mt-1">{errors.address}</p>}
+              <div className="rounded-xl border border-gold/20 bg-gold/5 p-4 flex items-start gap-3">
+                <span className="text-gold text-lg">📍</span>
+                <p className="text-sm text-white/70">
+                  Collection address will be sent after payment confirmation.
+                </p>
               </div>
 
               <button
@@ -223,7 +210,6 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
                 <hr className="border-white/10" />
                 <Row label="Name" value={name} />
                 <Row label="Phone" value={phone} />
-                <Row label="Address" value={address} multiline />
                 <Row label="Payment" value="Online (Yoco)" />
               </div>
 
