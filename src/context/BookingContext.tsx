@@ -10,6 +10,7 @@ export interface Booking {
   customerName: string;
   customerPhone: string;
   paymentMethod: 'cash' | 'card' | 'online';
+  paymentStatus: 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled';
   createdAt: string;
 }
 
@@ -56,6 +57,7 @@ type BookingRow = {
   customer_name: string;
   customer_phone: string;
   payment_method: 'cash' | 'card' | 'online';
+  payment_status: 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled' | null;
   created_at: string;
 };
 
@@ -83,6 +85,7 @@ const mapBookingRowToBooking = (row: BookingRow): Booking => ({
   customerName: row.customer_name,
   customerPhone: row.customer_phone,
   paymentMethod: row.payment_method,
+  paymentStatus: row.payment_status ?? 'unpaid',
   createdAt: row.created_at,
 });
 
@@ -119,7 +122,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       const [bookingsResult, blockedDaysResult, blockedTimeSlotsResult] = await Promise.all([
         supabase
           .from('bookings')
-          .select('id, service, date, time, customer_name, customer_phone, payment_method, created_at')
+          .select('id, service, date, time, customer_name, customer_phone, payment_method, payment_status, created_at')
           .order('date', { ascending: true })
           .order('time', { ascending: true }),
         supabase
@@ -194,7 +197,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         customer_phone: bookingData.customerPhone,
         payment_method: bookingData.paymentMethod,
       })
-      .select('id, service, date, time, customer_name, customer_phone, payment_method, created_at')
+      .select('id, service, date, time, customer_name, customer_phone, payment_method, payment_status, created_at')
       .single();
 
     if (insertError) {
