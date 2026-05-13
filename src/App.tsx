@@ -9,6 +9,7 @@ import { AdminAuthProvider } from "./context/AdminAuthContext";
 import { RequireAdmin } from "./components/auth/RequireAdmin";
 import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminMerchOrders from "./pages/AdminMerchOrders";
 import AdminLogin from "./pages/AdminLogin";
 import MerchCatalog from "./pages/MerchCatalog";
 import MerchProduct from "./pages/MerchProduct";
@@ -97,6 +98,14 @@ const App = () => {
                     element={
                       <RequireAdmin>
                         <AdminDashboard />
+                      </RequireAdmin>
+                    }
+                  />
+                  <Route
+                    path="/admin/merch-orders"
+                    element={
+                      <RequireAdmin>
+                        <AdminMerchOrders />
                       </RequireAdmin>
                     }
                   />

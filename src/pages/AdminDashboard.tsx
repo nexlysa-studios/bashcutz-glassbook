@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
-import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, LogOut } from 'lucide-react';
+import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, LogOut, ShoppingBag, ArrowRight, CreditCard, Banknote, Globe } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { GlassNavbar } from '../components/layout/GlassNavbar';
 import { useBooking, Booking, TIME_SLOTS } from '../context/BookingContext';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useSEO } from '@/hooks/useSEO';
 import { to12HourTime } from '@/lib/time';
+import { fetchMerchOrders, formatRand, MerchOrderRow } from '@/lib/merchOrders';
 
 export default function AdminDashboard() {
   const { bookings, cancelBooking, blockedDays, toggleBlockDay, isLoading, error, isTimeSlotBlocked, toggleBlockTimeSlot } = useBooking();
@@ -24,6 +26,9 @@ export default function AdminDashboard() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [recentMerch, setRecentMerch] = useState<MerchOrderRow[]>([]);
+  const [merchLoading, setMerchLoading] = useState(true);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -34,6 +39,23 @@ export default function AdminDashboard() {
     }, containerRef);
 
     return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await fetchMerchOrders({ sinceDays: 7 });
+        if (!cancelled) setRecentMerch(data);
+      } catch {
+        // ignore — section will just show empty
+      } finally {
+        if (!cancelled) setMerchLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const days = eachDayOfInterval({
@@ -288,38 +310,129 @@ export default function AdminDashboard() {
                   <p className="text-white/40 text-center py-8">No bookings</p>
                 ) : (
                   (selectedDate ? getBookingsForDate(selectedDate) : upcomingBookings).map(
-                    (booking) => (
-                      <div
-                        key={booking.id}
-                        className="glass-card p-4 flex items-center justify-between"
-                      >
-                        <div>
-                          <p className="font-medium">{booking.customerName}</p>
-                          <p className="text-sm text-white/50">{booking.customerPhone}</p>
-                          <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
-                            <span className="text-gold">{booking.service.name}</span>
-                            <span>•</span>
-                            <span>{to12HourTime(booking.time)}</span>
-                            {!selectedDate && (
-                              <>
-                                <span>•</span>
-                                <span>{format(parseISO(booking.date), 'MMM d')}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => void handleCancelBooking(booking)}
-                          className="p-2 rounded-lg hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-colors tap-feedback"
+                    (booking) => {
+                      const method = booking.paymentMethod;
+                      const status = booking.paymentStatus;
+                      const MethodIcon = method === 'online' ? Globe : method === 'card' ? CreditCard : Banknote;
+                      const methodLabel = method === 'online' ? 'Online (Yoco)' : method === 'card' ? 'Card on arrival' : 'Cash on arrival';
+                      const statusBadge =
+                        method === 'online'
+                          ? status === 'paid'
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                            : status === 'pending'
+                              ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30'
+                              : status === 'failed' || status === 'cancelled'
+                                ? 'bg-red-500/20 text-red-300 border-red-400/30'
+                                : 'bg-white/10 text-white/60 border-white/20'
+                          : 'bg-white/10 text-white/60 border-white/20';
+                      return (
+                        <div
+                          key={booking.id}
+                          className="glass-card p-4 flex items-center justify-between gap-3"
                         >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                    )
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium">{booking.customerName}</p>
+                            <p className="text-sm text-white/50">{booking.customerPhone}</p>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-white/40">
+                              <span className="text-gold">{booking.service.name}</span>
+                              <span>•</span>
+                              <span>{to12HourTime(booking.time)}</span>
+                              {!selectedDate && (
+                                <>
+                                  <span>•</span>
+                                  <span>{format(parseISO(booking.date), 'MMM d')}</span>
+                                </>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 mt-2">
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-white/5 text-white/70 border border-white/10">
+                                <MethodIcon className="w-3 h-3" />
+                                {methodLabel}
+                              </span>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${statusBadge}`}>
+                                {method === 'online' ? status : 'pay on arrival'}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => void handleCancelBooking(booking)}
+                            className="p-2 rounded-lg hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-colors tap-feedback shrink-0"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                      );
+                    }
                   )
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Recent Merch Orders (last 7 days) */}
+          <div className="admin-card glass-card p-6 mt-8">
+            <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
+                  <ShoppingBag className="w-5 h-5 text-gold" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">Recent Merch Orders</h2>
+                  <p className="text-xs text-white/40">Last 7 days</p>
+                </div>
+              </div>
+              <Link
+                to="/admin/merch-orders"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold hover:opacity-80"
+              >
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {merchLoading ? (
+              <p className="text-white/40 text-sm py-4 text-center">Loading…</p>
+            ) : recentMerch.length === 0 ? (
+              <p className="text-white/40 text-sm py-4 text-center">No merch orders in the last 7 days.</p>
+            ) : (
+              <div className="space-y-3 max-h-[400px] overflow-y-auto scrollbar-hide">
+                {recentMerch.map((o) => {
+                  const total = o.payment_amount_cents ?? o.unit_price_cents * o.quantity;
+                  const badge =
+                    o.payment_status === 'paid'
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                      : o.payment_status === 'pending'
+                        ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30'
+                        : o.payment_status === 'failed' || o.payment_status === 'cancelled'
+                          ? 'bg-red-500/20 text-red-300 border-red-400/30'
+                          : 'bg-white/10 text-white/60 border-white/20';
+                  return (
+                    <div key={o.id} className="glass-card p-4 flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium">{o.customer_name}</p>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${badge}`}>
+                            {o.payment_status}
+                          </span>
+                        </div>
+                        <p className="text-sm text-white/50">{o.customer_phone}</p>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-white/40">
+                          <span className="text-gold">{o.product_name}</span>
+                          <span>•</span>
+                          <span>Size {o.size}</span>
+                          <span>•</span>
+                          <span>Qty {o.quantity}</span>
+                          <span>•</span>
+                          <span>{format(parseISO(o.created_at), 'MMM d, HH:mm')}</span>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-base font-bold text-gold">{formatRand(total)}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </main>

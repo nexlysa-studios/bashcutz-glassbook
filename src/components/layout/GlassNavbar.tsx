@@ -1,6 +1,7 @@
 import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,7 @@ import {
 export function GlassNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthed } = useAdminAuth();
 
   const handleScroll = () => setIsScrolled(window.scrollY > 20);
 
@@ -56,6 +58,12 @@ export function GlassNavbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {isAuthed && (
+              <Link to="/admin/merch-orders" className="text-base font-semibold text-amber-600 dark:text-yellow-400 hover:opacity-80 transition">
+                Merch Orders
+              </Link>
+            )}
+
             <a href="/#services" className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 dark:from-yellow-500 dark:to-yellow-600 text-white dark:text-black font-semibold text-base hover:shadow-lg transition-all duration-300 hover:scale-105 ml-auto">
               Book Now
             </a>
@@ -83,6 +91,12 @@ export function GlassNavbar() {
               Shop Now
             </Link>
           </div>
+
+          {isAuthed && (
+            <Link to="/admin/merch-orders" onClick={() => setIsMobileMenuOpen(false)} className="text-base font-semibold text-amber-600 dark:text-yellow-400">
+              Merch Orders
+            </Link>
+          )}
 
           <a href="/#services" onClick={() => setIsMobileMenuOpen(false)} className="px-5 py-3.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 dark:from-yellow-500 dark:to-yellow-600 text-white dark:text-black font-semibold text-base text-center hover:shadow-lg transition-all duration-300 mt-2">
             Book Now

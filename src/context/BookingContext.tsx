@@ -10,6 +10,7 @@ export interface Booking {
   customerName: string;
   customerPhone: string;
   paymentMethod: 'cash' | 'card' | 'online';
+  paymentStatus: 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled';
   createdAt: string;
 }
 
@@ -21,7 +22,7 @@ interface BookingContextType {
   blockedTimeSlots: BlockedTimeSlot[];
   isLoading: boolean;
   error: string | null;
-  addBooking: (booking: Omit<Booking, 'id' | 'createdAt'>) => Promise<Booking>;
+  addBooking: (booking: Omit<Booking, 'id' | 'createdAt' | 'paymentStatus'>) => Promise<Booking>;
   cancelBooking: (id: string) => Promise<void>;
   getBookingsForDate: (date: string) => Booking[];
   isTimeSlotTaken: (date: string, time: string) => boolean;
@@ -56,6 +57,7 @@ type BookingRow = {
   customer_name: string;
   customer_phone: string;
   payment_method: 'cash' | 'card' | 'online';
+  payment_status: 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled' | null;
   created_at: string;
 };
 
@@ -83,6 +85,7 @@ const mapBookingRowToBooking = (row: BookingRow): Booking => ({
   customerName: row.customer_name,
   customerPhone: row.customer_phone,
   paymentMethod: row.payment_method,
+  paymentStatus: row.payment_status ?? 'unpaid',
   createdAt: row.created_at,
 });
 
@@ -119,7 +122,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       const [bookingsResult, blockedDaysResult, blockedTimeSlotsResult] = await Promise.all([
         supabase
           .from('bookings')
-          .select('id, service, date, time, customer_name, customer_phone, payment_method, created_at')
+          .select('id, service, date, time, customer_name, customer_phone, payment_method, payment_status, created_at')
           .order('date', { ascending: true })
           .order('time', { ascending: true }),
         supabase
@@ -169,7 +172,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     void refreshData();
   }, [refreshData]);
 
-  const addBooking = async (bookingData: Omit<Booking, 'id' | 'createdAt'>): Promise<Booking> => {
+  const addBooking = async (bookingData: Omit<Booking, 'id' | 'createdAt' | 'paymentStatus'>): Promise<Booking> => {
     const bookingDateTime = new Date(`${normalizeDate(bookingData.date)}T${bookingData.time}:00`);
     if (!Number.isNaN(bookingDateTime.getTime()) && bookingDateTime.getTime() <= Date.now()) {
       throw new Error('This time has already passed. Please pick another time.');
@@ -194,7 +197,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         customer_phone: bookingData.customerPhone,
         payment_method: bookingData.paymentMethod,
       })
-      .select('id, service, date, time, customer_name, customer_phone, payment_method, created_at')
+      .select('id, service, date, time, customer_name, customer_phone, payment_method, payment_status, created_at')
       .single();
 
     if (insertError) {
