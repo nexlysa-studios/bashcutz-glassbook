@@ -23,8 +23,7 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
   const [step, setStep] = useState<Step>('details');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [errors, setErrors] = useState<{ name?: string; phone?: string; address?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const overlayRef = useRef<HTMLDivElement>(null);
