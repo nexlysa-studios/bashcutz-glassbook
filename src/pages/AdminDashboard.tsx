@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
-import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, LogOut } from 'lucide-react';
+import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, LogOut, ShoppingBag, ArrowRight, CreditCard, Banknote, Globe } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { GlassNavbar } from '../components/layout/GlassNavbar';
 import { useBooking, Booking, TIME_SLOTS } from '../context/BookingContext';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useSEO } from '@/hooks/useSEO';
 import { to12HourTime } from '@/lib/time';
+import { fetchMerchOrders, formatRand, MerchOrderRow } from '@/lib/merchOrders';
 
 export default function AdminDashboard() {
   const { bookings, cancelBooking, blockedDays, toggleBlockDay, isLoading, error, isTimeSlotBlocked, toggleBlockTimeSlot } = useBooking();
