@@ -11,7 +11,6 @@ type OrderRow = {
   unit_price_cents: number;
   customer_name: string;
   customer_phone: string;
-  customer_address: string | null;
   payment_status: 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled';
 };
 
@@ -63,7 +62,7 @@ export default function MerchSuccess() {
       }
       const { data, error: e } = await supabase
         .from('merch_orders')
-        .select('id, product_name, size, quantity, unit_price_cents, customer_name, customer_phone, customer_address, payment_status')
+        .select('id, product_name, size, quantity, unit_price_cents, customer_name, customer_phone, payment_status')
         .eq('id', orderId)
         .maybeSingle();
       if (cancelled) return;
@@ -100,12 +99,12 @@ export default function MerchSuccess() {
       `*BASHCUTZ Merch Order Confirmation*\n\n` +
         `Name: ${order.customer_name}\n` +
         `Phone: ${order.customer_phone}\n` +
-        `Address: ${order.customer_address ?? '-'}\n` +
         `Payment: ONLINE (PAID via Yoco)\n` +
         `Product: ${order.product_name}\n` +
         `Size: ${order.size}\n` +
         `Quantity: ${order.quantity}\n` +
-        `Total: R${total.toFixed(2)}`,
+        `Total: R${total.toFixed(2)}\n\n` +
+        `Collection address will be shared here.`,
     );
     const isMobile = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const url = isMobile
