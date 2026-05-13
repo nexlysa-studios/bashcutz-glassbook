@@ -26,6 +26,9 @@ export default function AdminDashboard() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [recentMerch, setRecentMerch] = useState<MerchOrderRow[]>([]);
+  const [merchLoading, setMerchLoading] = useState(true);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -36,6 +39,23 @@ export default function AdminDashboard() {
     }, containerRef);
 
     return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await fetchMerchOrders({ sinceDays: 7 });
+        if (!cancelled) setRecentMerch(data);
+      } catch {
+        // ignore — section will just show empty
+      } finally {
+        if (!cancelled) setMerchLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const days = eachDayOfInterval({
