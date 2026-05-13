@@ -310,34 +310,59 @@ export default function AdminDashboard() {
                   <p className="text-white/40 text-center py-8">No bookings</p>
                 ) : (
                   (selectedDate ? getBookingsForDate(selectedDate) : upcomingBookings).map(
-                    (booking) => (
-                      <div
-                        key={booking.id}
-                        className="glass-card p-4 flex items-center justify-between"
-                      >
-                        <div>
-                          <p className="font-medium">{booking.customerName}</p>
-                          <p className="text-sm text-white/50">{booking.customerPhone}</p>
-                          <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
-                            <span className="text-gold">{booking.service.name}</span>
-                            <span>•</span>
-                            <span>{to12HourTime(booking.time)}</span>
-                            {!selectedDate && (
-                              <>
-                                <span>•</span>
-                                <span>{format(parseISO(booking.date), 'MMM d')}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => void handleCancelBooking(booking)}
-                          className="p-2 rounded-lg hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-colors tap-feedback"
+                    (booking) => {
+                      const method = booking.paymentMethod;
+                      const status = booking.paymentStatus;
+                      const MethodIcon = method === 'online' ? Globe : method === 'card' ? CreditCard : Banknote;
+                      const methodLabel = method === 'online' ? 'Online (Yoco)' : method === 'card' ? 'Card on arrival' : 'Cash on arrival';
+                      const statusBadge =
+                        method === 'online'
+                          ? status === 'paid'
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                            : status === 'pending'
+                              ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30'
+                              : status === 'failed' || status === 'cancelled'
+                                ? 'bg-red-500/20 text-red-300 border-red-400/30'
+                                : 'bg-white/10 text-white/60 border-white/20'
+                          : 'bg-white/10 text-white/60 border-white/20';
+                      return (
+                        <div
+                          key={booking.id}
+                          className="glass-card p-4 flex items-center justify-between gap-3"
                         >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                    )
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium">{booking.customerName}</p>
+                            <p className="text-sm text-white/50">{booking.customerPhone}</p>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-white/40">
+                              <span className="text-gold">{booking.service.name}</span>
+                              <span>•</span>
+                              <span>{to12HourTime(booking.time)}</span>
+                              {!selectedDate && (
+                                <>
+                                  <span>•</span>
+                                  <span>{format(parseISO(booking.date), 'MMM d')}</span>
+                                </>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 mt-2">
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-white/5 text-white/70 border border-white/10">
+                                <MethodIcon className="w-3 h-3" />
+                                {methodLabel}
+                              </span>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${statusBadge}`}>
+                                {method === 'online' ? status : 'pay on arrival'}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => void handleCancelBooking(booking)}
+                            className="p-2 rounded-lg hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-colors tap-feedback shrink-0"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                      );
+                    }
                   )
                 )}
               </div>
