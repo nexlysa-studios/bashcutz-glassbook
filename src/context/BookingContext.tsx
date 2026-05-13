@@ -24,6 +24,7 @@ interface BookingContextType {
   error: string | null;
   addBooking: (booking: Omit<Booking, 'id' | 'createdAt' | 'paymentStatus'>) => Promise<Booking>;
   cancelBooking: (id: string) => Promise<void>;
+  updateBookingStatus: (id: string, status: Booking['paymentStatus']) => Promise<void>;
   getBookingsForDate: (date: string) => Booking[];
   isTimeSlotTaken: (date: string, time: string) => boolean;
   isTimeSlotBlocked: (date: string, time: string) => boolean;
@@ -222,6 +223,22 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     setBookings((prev) => prev.filter((b) => b.id !== id));
   };
 
+  const updateBookingStatus = async (id: string, status: Booking['paymentStatus']) => {
+    const supabase = getSupabaseClient();
+    const { error: updateError } = await supabase
+      .from('bookings')
+      .update({ payment_status: status })
+      .eq('id', id);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    setBookings((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, paymentStatus: status } : b)),
+    );
+  };
+
   const getBookingsForDate = (date: string): Booking[] => {
     return bookings.filter((b) => b.date === date);
   };
@@ -331,6 +348,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         error,
         addBooking,
         cancelBooking,
+        updateBookingStatus,
         getBookingsForDate,
         isTimeSlotTaken,
         isTimeSlotBlocked,

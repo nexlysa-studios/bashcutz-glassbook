@@ -314,7 +314,7 @@ export default function AdminDashboard() {
                       const method = booking.paymentMethod;
                       const status = booking.paymentStatus;
                       const MethodIcon = method === 'online' ? Globe : method === 'card' ? CreditCard : Banknote;
-                      const methodLabel = method === 'online' ? 'Online (Yoco)' : method === 'card' ? 'Card on arrival' : 'Cash on arrival';
+                      const methodLabel = method === 'online' ? 'Online (Yoco)' : method === 'card' ? 'Card' : 'Cash';
                       const statusBadge =
                         method === 'online'
                           ? status === 'paid'

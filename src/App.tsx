@@ -10,6 +10,7 @@ import { RequireAdmin } from "./components/auth/RequireAdmin";
 import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminMerchOrders from "./pages/AdminMerchOrders";
+import AdminBookings from "./pages/AdminBookings";
 import AdminLogin from "./pages/AdminLogin";
 import MerchCatalog from "./pages/MerchCatalog";
 import MerchProduct from "./pages/MerchProduct";
@@ -106,6 +107,14 @@ const App = () => {
                     element={
                       <RequireAdmin>
                         <AdminMerchOrders />
+                      </RequireAdmin>
+                    }
+                  />
+                  <Route
+                    path="/admin/bookings"
+                    element={
+                      <RequireAdmin>
+                        <AdminBookings />
                       </RequireAdmin>
                     }
                   />
