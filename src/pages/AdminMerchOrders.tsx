@@ -53,14 +53,10 @@ export default function AdminMerchOrders() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black">
       <GlassNavbar />
-      <main className="pt-24 pb-12 px-6">
+      <main className="pt-28 pb-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-8 flex items-center justify-between gap-4">
+          <div className="mt-4 mb-8 flex items-center justify-between gap-4">
             <div>
-              <Link to="/admin" className="inline-flex items-center gap-2 text-xs text-white/50 hover:text-white mb-2">
-                <ArrowLeft className="h-3.5 w-3.5" /> Back to dashboard
-              </Link>
-              <span className="text-gold text-sm font-medium tracking-widest uppercase mb-2 block">Admin</span>
               <h1 className="text-3xl md:text-4xl font-bold">Merch Orders</h1>
             </div>
           </div>

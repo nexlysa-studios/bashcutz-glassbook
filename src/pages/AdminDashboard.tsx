@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
-import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, LogOut, ShoppingBag, ArrowRight, CreditCard, Banknote, Globe } from 'lucide-react';
+import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, ShoppingBag, ArrowRight, CreditCard, Banknote, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GlassNavbar } from '../components/layout/GlassNavbar';
 import { useBooking, Booking, TIME_SLOTS } from '../context/BookingContext';
-import { useAdminAuth } from '@/context/AdminAuthContext';
-import { useNavigate } from 'react-router-dom';
 import { useSEO } from '@/hooks/useSEO';
 import { to12HourTime } from '@/lib/time';
 import { fetchMerchOrders, formatRand, MerchOrderRow } from '@/lib/merchOrders';
@@ -20,8 +18,6 @@ export default function AdminDashboard() {
     robots: 'noindex, nofollow',
   });
 
-  const { logout } = useAdminAuth();
-  const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -93,25 +89,12 @@ export default function AdminDashboard() {
     <div ref={containerRef} className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black">
       <GlassNavbar />
 
-      <main className="pt-24 pb-12 px-6">
+      <main className="pt-28 pb-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-8 flex items-center justify-between gap-4">
+          <div className="mt-4 mb-8 flex items-center justify-between gap-4">
             <div>
-              <span className="text-gold text-sm font-medium tracking-widest uppercase mb-2 block">
-                Dashboard
-              </span>
-              <h1 className="text-3xl md:text-4xl font-bold">Admin Panel</h1>
+              <h1 className="text-3xl md:text-4xl font-bold">Dashboard</h1>
             </div>
-            <button
-              onClick={async () => {
-                await logout();
-                navigate('/');
-              }}
-              className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
-            >
-              <LogOut className="h-4 w-4" />
-              Log out
-            </button>
           </div>
 
           {/* Stats Grid */}

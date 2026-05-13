@@ -1,6 +1,6 @@
 import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import {
   DropdownMenu,
@@ -12,9 +12,15 @@ import {
 export function GlassNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isAuthed } = useAdminAuth();
+  const { isAuthed, logout } = useAdminAuth();
+  const navigate = useNavigate();
 
   const handleScroll = () => setIsScrolled(window.scrollY > 20);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -64,12 +70,21 @@ export function GlassNavbar() {
 
             {isAuthed && (
               <>
-                <Link to="/admin/bookings" className="text-base font-semibold text-amber-600 dark:text-yellow-400 hover:opacity-80 transition">
+                <Link to="/admin" className="text-base font-semibold text-foreground/70 dark:text-white/70 hover:text-amber-600 dark:hover:text-yellow-400 transition-colors duration-300">
+                  Dashboard
+                </Link>
+                <Link to="/admin/bookings" className="text-base font-semibold text-foreground/70 dark:text-white/70 hover:text-amber-600 dark:hover:text-yellow-400 transition-colors duration-300">
                   Bookings
                 </Link>
-                <Link to="/admin/merch-orders" className="text-base font-semibold text-amber-600 dark:text-yellow-400 hover:opacity-80 transition">
+                <Link to="/admin/merch-orders" className="text-base font-semibold text-foreground/70 dark:text-white/70 hover:text-amber-600 dark:hover:text-yellow-400 transition-colors duration-300">
                   Merch Orders
                 </Link>
+                <button
+                  onClick={handleLogout}
+                  className="ml-auto px-4 py-2 rounded-lg border border-white/15 bg-white/10 text-sm font-semibold text-white/90 hover:bg-white/20 transition-all duration-300"
+                >
+                  Log out
+                </button>
               </>
             )}
 
@@ -109,12 +124,24 @@ export function GlassNavbar() {
 
           {isAuthed && (
             <>
+              <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-base font-semibold text-amber-600 dark:text-yellow-400">
+                Dashboard
+              </Link>
               <Link to="/admin/bookings" onClick={() => setIsMobileMenuOpen(false)} className="text-base font-semibold text-amber-600 dark:text-yellow-400">
                 Bookings
               </Link>
               <Link to="/admin/merch-orders" onClick={() => setIsMobileMenuOpen(false)} className="text-base font-semibold text-amber-600 dark:text-yellow-400">
                 Merch Orders
               </Link>
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  void handleLogout();
+                }}
+                className="w-full px-5 py-3.5 rounded-lg bg-red-500/20 text-red-400 font-semibold text-base text-center hover:bg-red-500/30 transition-all duration-300 mt-2"
+              >
+                Log out
+              </button>
             </>
           )}
 
