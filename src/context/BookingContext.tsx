@@ -22,7 +22,7 @@ interface BookingContextType {
   blockedTimeSlots: BlockedTimeSlot[];
   isLoading: boolean;
   error: string | null;
-  addBooking: (booking: Omit<Booking, 'id' | 'createdAt'>) => Promise<Booking>;
+  addBooking: (booking: Omit<Booking, 'id' | 'createdAt' | 'paymentStatus'>) => Promise<Booking>;
   cancelBooking: (id: string) => Promise<void>;
   getBookingsForDate: (date: string) => Booking[];
   isTimeSlotTaken: (date: string, time: string) => boolean;
@@ -172,7 +172,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     void refreshData();
   }, [refreshData]);
 
-  const addBooking = async (bookingData: Omit<Booking, 'id' | 'createdAt'>): Promise<Booking> => {
+  const addBooking = async (bookingData: Omit<Booking, 'id' | 'createdAt' | 'paymentStatus'>): Promise<Booking> => {
     const bookingDateTime = new Date(`${normalizeDate(bookingData.date)}T${bookingData.time}:00`);
     if (!Number.isNaN(bookingDateTime.getTime()) && bookingDateTime.getTime() <= Date.now()) {
       throw new Error('This time has already passed. Please pick another time.');
