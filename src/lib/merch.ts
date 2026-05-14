@@ -56,7 +56,7 @@ export const merchItems: MerchItem[] = merchImagePairs.map((images, index) => {
       'Heavyweight cotton construction',
       'Front and back BASHCUTZ graphics',
       'Streetwear-inspired oversized feel',
-      'Available by WhatsApp order',
+      'Collection Only',
     ],
   };
 });
