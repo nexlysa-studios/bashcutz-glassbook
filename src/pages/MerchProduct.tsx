@@ -143,7 +143,7 @@ const MerchProduct = () => {
                 onClick={() => setCheckoutOpen(true)}
                 className="mb-6 inline-flex h-11 min-w-[150px] items-center justify-center border border-black bg-white px-5 text-xs uppercase tracking-[0.16em] text-black transition-colors hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black"
               >
-                Buy Now
+                Order
               </button>
 
               <ul className="mb-10 list-disc space-y-1 pl-4 text-xs leading-5 tracking-[0.02em] sm:text-sm">

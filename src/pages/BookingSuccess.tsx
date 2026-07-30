@@ -12,7 +12,7 @@ type BookingRow = {
   time: string;
   customer_name: string;
   customer_phone: string;
-  payment_method: 'cash' | 'card' | 'online';
+  payment_method: 'cash' | 'card';
   payment_status: 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled';
 };
 
@@ -22,98 +22,68 @@ export default function BookingSuccess() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const bookingId = params.get('bookingId');
-  const statusParam = params.get('status'); // 'cancelled' | 'failed' | null
+  const statusParam = params.get('status');
 
   const [booking, setBooking] = useState<BookingRow | null>(null);
-  const [polling, setPolling] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sentWhatsapp, setSentWhatsapp] = useState(false);
 
-  // Poll the booking row until payment_status changes from "pending"
   useEffect(() => {
     if (!bookingId || !isSupabaseConfigured) {
       setError('Missing booking reference.');
-      setPolling(false);
+      setLoading(false);
       return;
     }
+
     const supabase = getSupabaseClient();
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
     let cancelled = false;
-    let attempts = 0;
 
-    const verifyWithYoco = async () => {
-      try {
-        await fetch(`${supabaseUrl}/functions/v1/yoco-verify-payment`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${anonKey}`,
-            apikey: anonKey,
-          },
-          body: JSON.stringify({ bookingId }),
-        });
-      } catch (err) {
-        console.warn('yoco-verify-payment failed', err);
-      }
-    };
-
-    const tick = async () => {
-      attempts += 1;
-      // Ask the edge function to reconcile with Yoco directly (covers webhook delays/failures)
-      // Run on attempt 1 and then every 3 attempts.
-      if (attempts === 1 || attempts % 3 === 0) {
-        await verifyWithYoco();
-      }
-
+    const loadBooking = async () => {
       const { data, error: e } = await supabase
         .from('bookings')
         .select('id, service, date, time, customer_name, customer_phone, payment_method, payment_status')
         .eq('id', bookingId)
         .maybeSingle();
+
       if (cancelled) return;
       if (e) {
         setError(e.message);
-        setPolling(false);
+        setLoading(false);
         return;
       }
       if (!data) {
         setError('Booking not found.');
-        setPolling(false);
+        setLoading(false);
         return;
       }
+
       setBooking(data as BookingRow);
-      const finalised = data.payment_status === 'paid' || data.payment_status === 'failed' || data.payment_status === 'cancelled';
-      if (finalised || attempts > 30) {
-        setPolling(false);
-      } else {
-        setTimeout(tick, 2000);
-      }
+      setLoading(false);
     };
-    tick();
+
+    void loadBooking();
     return () => {
       cancelled = true;
     };
   }, [bookingId]);
 
-  // Send WhatsApp confirmation once we see "paid"
   useEffect(() => {
     if (!booking || sentWhatsapp) return;
-    if (booking.payment_status !== 'paid') return;
 
     const extra = bookingId ? sessionStorage.getItem(`bashcutz_booking_${bookingId}`) : null;
     const firstTime = extra ? (JSON.parse(extra)?.firstTimeCutter ? 'YES - send location' : 'NO') : 'NO';
 
     const message = encodeURIComponent(
       `*BASHCUTZ Booking Confirmation*\n\n` +
-      `Name: ${booking.customer_name}\n` +
-      `Phone: ${booking.customer_phone}\n` +
-      `First Time Cutter: ${firstTime}\n` +
-      `Payment: ONLINE (PAID via Yoco)\n` +
-      `Service: ${booking.service.name}\n` +
-      `Date: ${format(parseISO(booking.date), 'EEEE, MMMM d, yyyy')}\n` +
-      `Time: ${to12HourTime(booking.time)}\n` +
-      `Price: R${booking.service.price}`,
+        `Name: ${booking.customer_name}\n` +
+        `Phone: ${booking.customer_phone}\n` +
+        `First Time Cutter: ${firstTime}\n` +
+        `Payment: ${booking.payment_method.toUpperCase()}\n` +
+        `Service: ${booking.service.name}\n` +
+        `Date: ${format(parseISO(booking.date), 'EEEE, MMMM d, yyyy')}\n` +
+        `Time: ${to12HourTime(booking.time)}\n` +
+        `Price: R${booking.service.price}`,
     );
     const isMobile = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const url = isMobile
@@ -124,23 +94,23 @@ export default function BookingSuccess() {
     else window.open(url, '_blank', 'noopener,noreferrer');
   }, [booking, bookingId, sentWhatsapp]);
 
-  const status = booking?.payment_status ?? (statusParam === 'failed' ? 'failed' : statusParam === 'cancelled' ? 'cancelled' : 'pending');
+  const status = booking ? 'paid' : (statusParam === 'failed' ? 'failed' : statusParam === 'cancelled' ? 'cancelled' : 'pending');
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="glass-card max-w-md w-full p-8 text-center">
-        {polling && status === 'pending' && (
+        {loading && (
           <>
             <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-amber-400" />
-            <h1 className="text-2xl font-bold mb-2">Confirming Payment…</h1>
-            <p className="text-white/60 text-sm">Hold tight while we verify your Yoco payment.</p>
+            <h1 className="text-2xl font-bold mb-2">Loading booking…</h1>
+            <p className="text-white/60 text-sm">Please wait while we pull up your booking details.</p>
           </>
         )}
 
         {status === 'paid' && (
           <>
             <CheckCircle2 className="w-14 h-14 mx-auto mb-4 text-amber-400" />
-            <h1 className="text-2xl font-bold mb-2">Payment Received 🎉</h1>
+            <h1 className="text-2xl font-bold mb-2">Booking Confirmed 🎉</h1>
             <p className="text-white/70 mb-6">Your booking is confirmed. WhatsApp should open with your confirmation message.</p>
             <Link to="/" className="glass-button-primary inline-block">Back Home</Link>
           </>
@@ -150,26 +120,19 @@ export default function BookingSuccess() {
           <>
             <XCircle className="w-14 h-14 mx-auto mb-4 text-red-400" />
             <h1 className="text-2xl font-bold mb-2">
-              {status === 'failed' ? 'Payment Failed' : 'Payment Cancelled'}
+              {status === 'failed' ? 'Booking Could Not Be Confirmed' : 'Booking Cancelled'}
             </h1>
-            <p className="text-white/70 mb-6">No charge was made. You can try again or pick a different payment method.</p>
+            <p className="text-white/70 mb-6">Please try again or contact us on WhatsApp for help.</p>
             <button onClick={() => navigate('/')} className="glass-button-primary">Try Again</button>
           </>
         )}
 
-        {!polling && status === 'pending' && (
+        {!loading && status === 'pending' && (
           <>
             <Loader2 className="w-12 h-12 mx-auto mb-4 text-amber-400" />
-            <h1 className="text-2xl font-bold mb-2">Still Confirming…</h1>
-            <p className="text-white/70 mb-6">
-              Your payment is taking longer than expected. If money was deducted, your booking will be confirmed shortly. You can refresh this page or contact us on WhatsApp.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="glass-button-primary mr-2"
-            >
-              Refresh
-            </button>
+            <h1 className="text-2xl font-bold mb-2">Almost there…</h1>
+            <p className="text-white/70 mb-6">We&apos;re loading your booking details. If the page doesn&apos;t update, please refresh or contact us on WhatsApp.</p>
+            <button onClick={() => window.location.reload()} className="glass-button-primary mr-2">Refresh</button>
             <Link to="/" className="glass-button-secondary inline-block">Back Home</Link>
           </>
         )}

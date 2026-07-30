@@ -9,12 +9,12 @@ export interface Booking {
   time: string; // HH:MM
   customerName: string;
   customerPhone: string;
-  paymentMethod: 'cash' | 'card' | 'online';
+  paymentMethod: 'cash' | 'card';
   paymentStatus: 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled';
   createdAt: string;
 }
 
-export type PaymentMethod = 'cash' | 'card' | 'online';
+export type PaymentMethod = 'cash' | 'card';
 
 interface BookingContextType {
   bookings: Booking[];
@@ -57,7 +57,7 @@ type BookingRow = {
   time: string;
   customer_name: string;
   customer_phone: string;
-  payment_method: 'cash' | 'card' | 'online';
+  payment_method: 'cash' | 'card';
   payment_status: 'unpaid' | 'pending' | 'paid' | 'failed' | 'cancelled' | null;
   created_at: string;
 };

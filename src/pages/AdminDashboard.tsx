@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
-import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, ShoppingBag, ArrowRight, CreditCard, Banknote, Globe } from 'lucide-react';
+import { Calendar, Users, X, ChevronLeft, ChevronRight, Lock, Unlock, ShoppingBag, ArrowRight, CreditCard, Banknote } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GlassNavbar } from '../components/layout/GlassNavbar';
 import { useBooking, Booking, TIME_SLOTS } from '../context/BookingContext';
@@ -296,18 +296,9 @@ export default function AdminDashboard() {
                     (booking) => {
                       const method = booking.paymentMethod;
                       const status = booking.paymentStatus;
-                      const MethodIcon = method === 'online' ? Globe : method === 'card' ? CreditCard : Banknote;
-                      const methodLabel = method === 'online' ? 'Online (Yoco)' : method === 'card' ? 'Card' : 'Cash';
-                      const statusBadge =
-                        method === 'online'
-                          ? status === 'paid'
-                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
-                            : status === 'pending'
-                              ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30'
-                              : status === 'failed' || status === 'cancelled'
-                                ? 'bg-red-500/20 text-red-300 border-red-400/30'
-                                : 'bg-white/10 text-white/60 border-white/20'
-                          : 'bg-white/10 text-white/60 border-white/20';
+                      const MethodIcon = method === 'card' ? CreditCard : Banknote;
+                      const methodLabel = method === 'card' ? 'Card' : 'Cash';
+                      const statusBadge = 'bg-white/10 text-white/60 border-white/20';
                       return (
                         <div
                           key={booking.id}
@@ -333,7 +324,7 @@ export default function AdminDashboard() {
                                 {methodLabel}
                               </span>
                               <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${statusBadge}`}>
-                                {method === 'online' ? status : 'pay on arrival'}
+                                {status === 'paid' ? 'paid' : 'pay on arrival'}
                               </span>
                             </div>
                           </div>

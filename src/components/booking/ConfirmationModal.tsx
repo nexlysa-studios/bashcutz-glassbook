@@ -13,7 +13,7 @@ interface ConfirmationModalProps {
   date: Date;
   time: string;
   customerName: string;
-  paymentMethod: 'cash' | 'card' | 'online';
+  paymentMethod: 'cash' | 'card';
   firstTimeCutter: boolean;
 }
 
@@ -107,7 +107,7 @@ export function ConfirmationModal({
           </div>
           <div className="flex justify-between py-3 border-b border-white/10">
             <span className="text-white/50">Payment</span>
-            <span className="font-medium">{paymentMethod === 'online' ? 'Pay Online (Yoco)' : paymentMethod.toUpperCase()}</span>
+            <span className="font-medium">{paymentMethod.toUpperCase()}</span>
           </div>
           <div className="flex justify-between py-3 border-b border-white/10">
             <span className="text-white/50">First Time Cutter</span>

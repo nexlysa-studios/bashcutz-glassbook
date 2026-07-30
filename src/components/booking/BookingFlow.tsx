@@ -22,7 +22,7 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
   const [step, setStep] = useState<BookingStep>('date');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [customerData, setCustomerData] = useState<{ name: string; phone: string; paymentMethod: 'cash' | 'card' | 'online'; firstTimeCutter: boolean } | null>(null);
+  const [customerData, setCustomerData] = useState<{ name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean } | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const { addBooking } = useBooking();
@@ -83,7 +83,7 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
     setStep('details');
   };
 
-  const handleCustomerSubmit = (data: { name: string; phone: string; paymentMethod: 'cash' | 'card' | 'online'; firstTimeCutter: boolean }) => {
+  const handleCustomerSubmit = (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean }) => {
     setCustomerData(data);
     setShowConfirmation(true);
   };
@@ -107,40 +107,12 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
       return;
     }
 
-    // Online payments: redirect to Yoco checkout. WhatsApp confirmation
-    // is sent from /booking/success after payment completes.
-    if (customerData.paymentMethod === 'online') {
-      try {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-        const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-        const res = await fetch(`${supabaseUrl}/functions/v1/yoco-create-checkout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${anonKey}`,
-            apikey: anonKey,
-          },
-          body: JSON.stringify({ bookingId: createdBooking.id }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.redirectUrl) {
-          throw new Error(data?.error || 'Could not start online payment.');
-        }
-        // Persist details so the success page can send the WhatsApp message
-        sessionStorage.setItem(
-          `bashcutz_booking_${createdBooking.id}`,
-          JSON.stringify({
-            firstTimeCutter: customerData.firstTimeCutter,
-          }),
-        );
-        window.location.href = data.redirectUrl;
-        return;
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to start online payment.';
-        alert(message);
-        return;
-      }
-    }
+    sessionStorage.setItem(
+      `bashcutz_booking_${createdBooking.id}`,
+      JSON.stringify({
+        firstTimeCutter: customerData.firstTimeCutter,
+      }),
+    );
 
     // Cash / card flow — send WhatsApp message immediately
     const message = encodeURIComponent(

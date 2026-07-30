@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, CreditCard, Banknote, Globe } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, CreditCard, Banknote } from 'lucide-react';
 import { GlassNavbar } from '@/components/layout/GlassNavbar';
 import { useSEO } from '@/hooks/useSEO';
 import { useBooking, Booking } from '@/context/BookingContext';
@@ -132,8 +132,8 @@ export default function AdminBookings() {
                     {filtered
                       .sort((a, b) => parseISO(b.createdAt).getTime() - parseISO(a.createdAt).getTime())
                       .map((b) => {
-                        const MethodIcon = b.paymentMethod === 'online' ? Globe : b.paymentMethod === 'card' ? CreditCard : Banknote;
-                        const methodLabel = b.paymentMethod === 'online' ? 'Online (Yoco)' : b.paymentMethod === 'card' ? 'Card' : 'Cash';
+                        const MethodIcon = b.paymentMethod === 'card' ? CreditCard : Banknote;
+                        const methodLabel = b.paymentMethod === 'card' ? 'Card' : 'Cash';
                         return (
                           <tr key={b.id} className="border-b border-white/5 hover:bg-white/5">
                             <td className="py-3 pr-4 text-white/70 whitespace-nowrap">

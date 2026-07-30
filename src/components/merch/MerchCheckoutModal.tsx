@@ -101,21 +101,26 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
         throw new Error(insertErr?.message || 'Could not create order.');
       }
 
-      // 2. Create Yoco checkout
-      const res = await fetch(`${supabaseUrl}/functions/v1/yoco-create-merch-checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${anonKey}`,
-          apikey: anonKey,
-        },
-        body: JSON.stringify({ orderId: order.id }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.redirectUrl) {
-        throw new Error(data?.error || 'Could not start online payment.');
+      const message = encodeURIComponent(
+        `*BASHCUTZ Merch Order Confirmation*\n\n` +
+          `Name: ${name}\n` +
+          `Phone: ${phone}\n` +
+          `Product: ${item.name}\n` +
+          `Size: ${size}\n` +
+          `Quantity: 1\n` +
+          `Total: R${item.price}.00\n\n` +
+          `Collection address will be shared here.`,
+      );
+      const whatsappWebUrl = `https://wa.me/27607329632?text=${message}`;
+      const whatsappAppUrl = `whatsapp://send?phone=27607329632&text=${message}`;
+      const isMobile = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        window.location.replace(whatsappAppUrl);
+      } else {
+        window.open(whatsappWebUrl, '_blank', 'noopener,noreferrer');
       }
-      window.location.href = data.redirectUrl;
+      close();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to start checkout.';
       setSubmitError(message);
@@ -184,10 +189,9 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
                 />
                 {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
               </div>
-              <div className="rounded-xl border border-gold/20 bg-gold/5 p-4 flex items-start gap-3">
-                <span className="text-gold text-lg">📍</span>
+              <div className="rounded-xl border border-gold/20 bg-gold/5 p-4">
                 <p className="text-sm text-white/70">
-                  Collection address will be sent after payment confirmation.
+                  We&apos;ll confirm your order and share collection details on WhatsApp.
                 </p>
               </div>
 
@@ -210,7 +214,7 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
                 <hr className="border-white/10" />
                 <Row label="Name" value={name} />
                 <Row label="Phone" value={phone} />
-                <Row label="Payment" value="Online (Yoco)" />
+                <Row label="Payment" value="Cash / Card" />
               </div>
 
               {submitError && <p className="text-red-400 text-sm">{submitError}</p>}
@@ -219,10 +223,10 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
                 onClick={handleConfirm}
                 className="w-full bg-gold hover:bg-gold-light text-black font-semibold uppercase tracking-[0.16em] py-4 rounded-xl transition-colors"
               >
-                Confirm & Pay
+                Confirm Order
               </button>
               <p className="text-xs text-white/40 text-center">
-                You'll be redirected to Yoco to complete your secure payment.
+                We&apos;ll contact you on WhatsApp to confirm collection after your order is received.
               </p>
             </div>
           )}
@@ -230,7 +234,7 @@ export function MerchCheckoutModal({ isOpen, onClose, item, size }: MerchCheckou
           {step === 'submitting' && (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="w-10 h-10 animate-spin text-gold mb-4" />
-              <p className="text-white/70">Redirecting to Yoco…</p>
+              <p className="text-white/70">Preparing your order…</p>
             </div>
           )}
         </div>
