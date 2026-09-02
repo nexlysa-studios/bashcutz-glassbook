@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AD_NUMBERS = [10, 2, 14, 5, 8, 12, 4, 15, 7, 11, 1, 13, 6, 9];
+const AD_NUMBERS = Array.from({ length: 20 }, (_, i) => i + 1);
 const AUTO_ROTATE_MS = 5000;
 
 const ADS = AD_NUMBERS.map((number) => ({
-  id: number,
+  id: `ad-${number}`,
   src: `/Ad${number}.jpeg`,
   alt: `BASHCUTZ Official Merch Ad ${number}`,
 }));

@@ -26,7 +26,7 @@ export const services: Service[] = [
   {
     id: 'haircut-beard',
     name: 'Haircut + Beard Trim',
-    price: 190,
+    price: 200,
     description: 'Complete grooming experience',
     duration: '1 Hour',
     icon: 'sparkles',
