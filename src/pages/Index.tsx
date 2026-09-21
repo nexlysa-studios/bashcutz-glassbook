@@ -4,6 +4,7 @@ import { HeroSection } from '../components/sections/HeroSection';
 import { ServicesSection, Service } from '../components/sections/ServicesSection';
 import { GallerySection } from '../components/sections/GallerySection';
 import { MerchSection } from '../components/sections/MerchSection';
+import { NewsletterSection } from '../components/sections/NewsletterSection';
 import { BookingFlow } from '../components/booking/BookingFlow';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -89,6 +90,8 @@ const Index = () => {
       
       <MerchSection />
 
+      <NewsletterSection />
+
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-white/10">
         <div className="max-w-4xl mx-auto text-center">
@@ -108,6 +111,7 @@ const Index = () => {
             <a href="#services" className="text-foreground/60 dark:text-white/40 hover:text-gold transition-colors text-sm">Services</a>
             <a href="#gallery" className="text-foreground/60 dark:text-white/40 hover:text-gold transition-colors text-sm">Gallery</a>
             <a href="#merch" className="text-foreground/60 dark:text-white/40 hover:text-gold transition-colors text-sm">Merch</a>
+            <a href="#newsletter" className="text-foreground/60 dark:text-white/40 hover:text-gold transition-colors text-sm">Updates</a>
           </div>
           <div className="flex justify-center gap-4 mb-6">
             <a

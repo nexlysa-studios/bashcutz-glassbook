@@ -33,7 +33,7 @@ export function GlassNavbar() {
         <div className={`relative rounded-2xl backdrop-blur-md bg-white/40 dark:bg-white/8 border border-white/30 dark:border-white/10 shadow-xl dark:shadow-2xl px-4 md:px-6 ${isAuthed ? 'py-4 md:py-5' : 'py-3 md:py-4'} flex items-center transition-colors duration-300`}>
           <Link
             to="/"
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 md:gap-4 tap-feedback"
+            className={`${isAuthed ? 'hidden xl:flex' : 'flex'} absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-2 md:gap-4 tap-feedback`}
           >
             <img
               src="/Bashcutz-logo-removebg-preview.png"
@@ -43,7 +43,7 @@ export function GlassNavbar() {
             <span className="sr-only">BASHCUTZ</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8 flex-1">
+          <div className={`hidden md:flex items-center flex-1 ${isAuthed ? 'gap-4 lg:gap-6' : 'gap-8'}`}>
             {!isAuthed && (
               <>
                 <a href="/#services" className="text-base font-semibold text-foreground/70 dark:text-white/70 hover:text-amber-600 dark:hover:text-yellow-400 transition-colors duration-300">
@@ -79,6 +79,9 @@ export function GlassNavbar() {
                 <Link to="/admin/merch-orders" className="text-base font-semibold text-foreground/70 dark:text-white/70 hover:text-amber-600 dark:hover:text-yellow-400 transition-colors duration-300">
                   Merch Orders
                 </Link>
+                <Link to="/admin/newsletter" className="text-base font-semibold text-foreground/70 dark:text-white/70 hover:text-amber-600 dark:hover:text-yellow-400 transition-colors duration-300">
+                  Newsletter
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="ml-auto px-4 py-2 rounded-lg border border-white/15 bg-white/10 text-sm font-semibold text-white/90 hover:bg-white/20 transition-all duration-300"
@@ -101,7 +104,7 @@ export function GlassNavbar() {
         </div>
       </div>
 
-      <div className={`md:hidden absolute top-full left-4 right-4 mt-3 rounded-2xl backdrop-blur-md bg-white/50 dark:bg-white/8 border border-white/30 dark:border-white/10 shadow-xl dark:shadow-2xl transition-all duration-300 overflow-hidden ${isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+      <div className={`md:hidden absolute top-full left-4 right-4 mt-3 rounded-2xl backdrop-blur-md bg-white/50 dark:bg-white/8 border border-white/30 dark:border-white/10 shadow-xl dark:shadow-2xl transition-all duration-300 overflow-hidden ${isMobileMenuOpen ? 'max-h-[32rem] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
         <div className="px-6 py-5 flex flex-col gap-3">
           {!isAuthed && (
             <>
@@ -132,6 +135,9 @@ export function GlassNavbar() {
               </Link>
               <Link to="/admin/merch-orders" onClick={() => setIsMobileMenuOpen(false)} className="text-base font-semibold text-amber-600 dark:text-yellow-400">
                 Merch Orders
+              </Link>
+              <Link to="/admin/newsletter" onClick={() => setIsMobileMenuOpen(false)} className="text-base font-semibold text-amber-600 dark:text-yellow-400">
+                Newsletter
               </Link>
               <button
                 onClick={() => {

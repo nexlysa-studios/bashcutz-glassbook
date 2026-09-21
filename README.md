@@ -82,6 +82,27 @@ This project is built with:
 
 Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
 
+## Newsletter setup
+
+The newsletter frontend calls Supabase Edge Functions; Resend is never called from the browser. Apply the migration, store the Resend credentials as Supabase secrets, and deploy the three newsletter functions:
+
+```sh
+supabase login
+supabase link --project-ref YOUR_PROJECT_REF
+supabase db push
+supabase secrets set RESEND_API_KEY="re_xxxxx"
+supabase secrets set RESEND_FROM_EMAIL="BashCutz <updates@bashcutz.co.za>"
+supabase secrets set PUBLIC_SITE_URL="https://bashcutz.co.za"
+supabase secrets set NEWSLETTER_SITE_URL="https://bashcutz.co.za"
+supabase functions deploy newsletter-subscribe --no-verify-jwt
+supabase functions deploy newsletter-unsubscribe --no-verify-jwt
+supabase functions deploy send-newsletter
+```
+
+`newsletter-subscribe` and `newsletter-unsubscribe` are intentionally public preference endpoints and perform their own validation. `send-newsletter` keeps JWT verification enabled and also verifies the user and authenticated-admin RLS access inside the function.
+
+Do not create a `VITE_RESEND_API_KEY` variable locally or in Netlify. If one was previously configured, remove it and rotate that Resend key because `VITE_` values are browser-visible.
+
 ## Can I connect a custom domain to my Lovable project?
 
 Yes, you can!

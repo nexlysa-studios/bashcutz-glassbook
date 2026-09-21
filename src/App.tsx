@@ -17,6 +17,8 @@ import MerchProduct from "./pages/MerchProduct";
 import NotFound from "./pages/NotFound";
 import BookingSuccess from "./pages/BookingSuccess";
 import MerchSuccess from "./pages/MerchSuccess";
+import AdminNewsletter from "./pages/AdminNewsletter";
+import NewsletterUnsubscribe from "./pages/NewsletterUnsubscribe";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +95,7 @@ const App = () => {
                   <Route path="/merch/:productId" element={<MerchProduct />} />
                   <Route path="/booking/success" element={<BookingSuccess />} />
                   <Route path="/merch/success" element={<MerchSuccess />} />
+                  <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribe />} />
                   <Route path="/admin-login" element={<AdminLogin />} />
                   <Route
                     path="/admin"
@@ -115,6 +118,14 @@ const App = () => {
                     element={
                       <RequireAdmin>
                         <AdminBookings />
+                      </RequireAdmin>
+                    }
+                  />
+                  <Route
+                    path="/admin/newsletter"
+                    element={
+                      <RequireAdmin>
+                        <AdminNewsletter />
                       </RequireAdmin>
                     }
                   />

@@ -9,6 +9,7 @@ import { CustomerForm } from './CustomerForm';
 import { ConfirmationModal } from './ConfirmationModal';
 import { useBooking } from '../../context/BookingContext';
 import { to12HourTime } from '@/lib/time';
+import { subscribeToNewsletter } from '@/lib/newsletter';
 
 type BookingStep = 'date' | 'time' | 'details' | 'confirm';
 
@@ -22,7 +23,7 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
   const [step, setStep] = useState<BookingStep>('date');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [customerData, setCustomerData] = useState<{ name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean } | null>(null);
+  const [customerData, setCustomerData] = useState<{ name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean; newsletterConsent: boolean; newsletterEmail?: string } | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const { addBooking } = useBooking();
@@ -83,7 +84,7 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
     setStep('details');
   };
 
-  const handleCustomerSubmit = (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean }) => {
+  const handleCustomerSubmit = (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean; newsletterConsent: boolean; newsletterEmail?: string }) => {
     setCustomerData(data);
     setShowConfirmation(true);
   };
@@ -113,6 +114,19 @@ export function BookingFlow({ isOpen, onClose, service }: BookingFlowProps) {
         firstTimeCutter: customerData.firstTimeCutter,
       }),
     );
+
+    // Newsletter consent is independent of booking creation. A newsletter
+    // failure must never roll back or block a successful booking.
+    if (customerData.newsletterConsent && customerData.newsletterEmail) {
+      try {
+        await Promise.race([
+          subscribeToNewsletter(customerData.newsletterEmail),
+          new Promise((resolve) => window.setTimeout(resolve, 2500)),
+        ]);
+      } catch {
+        // Booking remains successful; the customer can use the homepage form.
+      }
+    }
 
     // Cash / card flow — send WhatsApp message immediately
     const message = encodeURIComponent(

@@ -6,10 +6,20 @@ const customerSchema = z.object({
   phone: z.string().trim().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
   paymentMethod: z.enum(['cash', 'card'], { required_error: 'Select a payment method' }),
   firstTimeCutter: z.enum(['yes', 'no'], { required_error: 'Select yes or no' }),
+  newsletterConsent: z.boolean(),
+  newsletterEmail: z.string(),
+}).superRefine((data, context) => {
+  if (data.newsletterConsent && !z.string().trim().email().safeParse(data.newsletterEmail).success) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['newsletterEmail'],
+      message: 'Enter a valid email to receive BashCutz updates',
+    });
+  }
 });
 
 interface CustomerFormProps {
-  onSubmit: (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean }) => void;
+  onSubmit: (data: { name: string; phone: string; paymentMethod: 'cash' | 'card'; firstTimeCutter: boolean; newsletterConsent: boolean; newsletterEmail?: string }) => void;
   onBack: () => void;
 }
 
@@ -18,7 +28,9 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
   const [phone, setPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | ''>('');
   const [firstTimeCutter, setFirstTimeCutter] = useState<'yes' | 'no' | ''>('');
-  const [errors, setErrors] = useState<{ name?: string; phone?: string; paymentMethod?: string; firstTimeCutter?: string }>({});
+  const [newsletterConsent, setNewsletterConsent] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [errors, setErrors] = useState<{ name?: string; phone?: string; paymentMethod?: string; firstTimeCutter?: string; newsletterEmail?: string }>({});
 
   const handlePhoneChange = (value: string) => {
     const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
@@ -28,12 +40,12 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const result = customerSchema.safeParse({ name, phone, paymentMethod, firstTimeCutter });
+    const result = customerSchema.safeParse({ name, phone, paymentMethod, firstTimeCutter, newsletterConsent, newsletterEmail });
     
     if (!result.success) {
-      const fieldErrors: { name?: string; phone?: string; paymentMethod?: string; firstTimeCutter?: string } = {};
+      const fieldErrors: { name?: string; phone?: string; paymentMethod?: string; firstTimeCutter?: string; newsletterEmail?: string } = {};
       result.error.errors.forEach((err) => {
-        const field = err.path[0] as 'name' | 'phone' | 'paymentMethod' | 'firstTimeCutter';
+        const field = err.path[0] as 'name' | 'phone' | 'paymentMethod' | 'firstTimeCutter' | 'newsletterEmail';
         fieldErrors[field] = err.message;
       });
       setErrors(fieldErrors);
@@ -46,6 +58,8 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
       phone: result.data.phone,
       paymentMethod: result.data.paymentMethod,
       firstTimeCutter: result.data.firstTimeCutter === 'yes',
+      newsletterConsent: result.data.newsletterConsent,
+      newsletterEmail: result.data.newsletterConsent ? result.data.newsletterEmail.trim().toLowerCase() : undefined,
     });
   };
 
@@ -152,6 +166,37 @@ export function CustomerForm({ onSubmit, onBack }: CustomerFormProps) {
           </div>
           {errors.firstTimeCutter && (
             <p className="text-red-400 text-sm mt-2">{errors.firstTimeCutter}</p>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={newsletterConsent}
+              onChange={(event) => setNewsletterConsent(event.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-white/20 accent-amber-500"
+            />
+            <span>
+              <span className="block text-sm font-medium text-white/80">Send me specials, price updates and BashCutz news.</span>
+              <span className="mt-1 block text-xs leading-5 text-white/40">Optional and unchecked by default. You can unsubscribe anytime.</span>
+            </span>
+          </label>
+          {newsletterConsent && (
+            <div className="mt-3">
+              <label htmlFor="booking-newsletter-email" className="mb-2 block text-xs text-white/55">Email address</label>
+              <input
+                id="booking-newsletter-email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={newsletterEmail}
+                onChange={(event) => setNewsletterEmail(event.target.value)}
+                placeholder="you@example.com"
+                className="glass-input"
+              />
+              {errors.newsletterEmail && <p className="mt-1 text-sm text-red-400">{errors.newsletterEmail}</p>}
+            </div>
           )}
         </div>
 
