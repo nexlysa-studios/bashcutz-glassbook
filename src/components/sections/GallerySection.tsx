@@ -6,39 +6,39 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Gallery images - using placeholder patterns, replace with real client photos
 const galleryImages = [
-  // If you place Cut1.jpeg in `public/` use the root-relative path below
+  // Use the JPG client gallery files in public/
   {
     id: 1,
     alt: 'Custom Designs',
-    src: '/Cut1.jpeg',
+    src: '/Cut1.JPG',
     gradient: 'from-gold to-amber-600',
     description: 'Pick between any design of your choice. - BashCutz',
   },
   {
     id: 2,
     alt: 'Classic High Fade',
-    src: '/Cut2.jpeg',
+    src: '/Cut2.JPG',
     gradient: 'from-amber-600 to-yellow-600',
     description: 'All fades available & kept blurry. - BashCutz',
   },
   {
     id: 3,
     alt: 'Taper Fade',
-    src: '/Cut3.jpeg',
+    src: '/Cut3.JPG',
     gradient: 'from-yellow-600 to-gold',
     description: 'All new & modern Cutz available. - BashCutz',
   },
   {
     id: 4,
     alt: 'Drop Fades',
-    src: '/Cut4.jpeg',
+    src: '/Cut4.JPG',
     gradient: 'from-gold to-amber-600',
     description: 'Fades dropped to your liking. - BashCutz',
   },
   {
     id: 5,
     alt: 'Beards',
-    src: '/Cut6.jpeg',
+    src: '/Cut5.JPG',
     gradient: 'from-yellow-600 to-gold',
     description: 'Shape, Style & Fade. - BashCutz',
   },

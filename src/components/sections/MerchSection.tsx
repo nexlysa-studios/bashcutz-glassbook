@@ -6,7 +6,10 @@ import { useNavigate } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AD_NUMBERS = Array.from({ length: 20 }, (_, i) => i + 1);
+const REMOVED_AD_NUMBERS = new Set([1, 3, 4, 6, 7, 8, 9, 10, 11, 15]);
+const AD_NUMBERS = Array.from({ length: 20 }, (_, i) => i + 1).filter(
+  (number) => !REMOVED_AD_NUMBERS.has(number)
+);
 const AUTO_ROTATE_MS = 5000;
 
 const ADS = AD_NUMBERS.map((number) => ({
