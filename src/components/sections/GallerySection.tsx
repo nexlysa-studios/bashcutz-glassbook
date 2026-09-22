@@ -23,24 +23,24 @@ const galleryImages = [
   },
   {
     id: 3,
-    alt: 'Taper Fade',
+    alt: 'Drop Fades',
     src: '/Cut3.JPG',
     gradient: 'from-yellow-600 to-gold',
-    description: 'All new & modern Cutz available. - BashCutz',
-  },
-  {
-    id: 4,
-    alt: 'Drop Fades',
-    src: '/Cut4.JPG',
-    gradient: 'from-gold to-amber-600',
     description: 'Fades dropped to your liking. - BashCutz',
   },
   {
-    id: 5,
+    id: 4,
     alt: 'Beards',
+    src: '/Cut4.JPG',
+    gradient: 'from-gold to-amber-600',
+    description: 'Shape, Style & Fade. - BashCutz',
+  },
+  {
+    id: 5,
+    alt: 'Taper Fade',
     src: '/Cut5.JPG',
     gradient: 'from-yellow-600 to-gold',
-    description: 'Shape, Style & Fade. - BashCutz',
+    description: 'All new & modern Cutz available. - BashCutz',
   },
 ];
 
